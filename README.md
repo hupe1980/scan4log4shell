@@ -17,7 +17,7 @@ Usage of scan4log4shell:
   -cidr string
     	subnet to scan (default "192.168.1.0/28")
   -listen
-    	start a listener to receiving callbacks (default false)
+    	start a listener to catch callbacks (default false)
   -ports string
     	ports (comma separated) to scan (default "8080")
 ```

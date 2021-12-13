@@ -97,7 +97,7 @@ func main() {
 	flag.StringVar(&callbackAddr, "caddr", "", "address to catch the callbacks (eg. ip:port)")
 	flag.StringVar(&destCIDR, "cidr", "192.168.1.0/28", "subnet to scan (default 192.168.1.0/28)")
 	flag.StringVar(&destPorts, "ports", "8080", "ports (comma separated) to scan (default 8080)")
-	flag.BoolVar(&listen, "listen", false, "start a listener to receiving callbacks (default false)")
+	flag.BoolVar(&listen, "listen", false, "start a listener to catch callbacks (default false)")
 
 	flag.Parse()
 
