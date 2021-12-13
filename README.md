@@ -13,7 +13,7 @@ CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2.
 ```bash
 Usage of scan4log4shell:
   -caddr string
-    	address to catch the callbacks
+    	address to catch the callbacks (eg. ip:port)
   -cidr string
     	subnet to scan (default "192.168.1.0/28")
   -listen
