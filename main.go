@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	"errors"
 	"flag"
 	"log"
 	"os"
@@ -21,6 +22,7 @@ type config struct {
 	caddr              string
 	cidr               string
 	ports              string
+	requestType        string
 	listen             bool
 	noUserAgentFuzzing bool
 	wafBypass          bool
@@ -31,13 +33,17 @@ func main() {
 
 	flag.StringVar(&cfg.caddr, "caddr", "", "address to catch the callbacks (eg. ip:port)")
 	flag.StringVar(&cfg.schema, "schema", "https", "schema to use for requests")
-	flag.StringVar(&cfg.cidr, "cidr", "192.168.1.0/28", "subnet to scan (default 192.168.1.0/28)")
-	flag.StringVar(&cfg.ports, "ports", "8080", "ports (comma separated) to scan (default 8080)")
+	flag.StringVar(&cfg.cidr, "cidr", "192.168.1.0/28", "subnet to scan")
+	flag.StringVar(&cfg.ports, "ports", "8080", "ports (comma separated) to scan")
 	flag.BoolVar(&cfg.listen, "listen", false, "start a listener to catch callbacks (default false)")
 	flag.BoolVar(&cfg.noUserAgentFuzzing, "no-user-agent-fuzzing", false, "exclude User-Agent header from fuzzing (default false)")
 	flag.BoolVar(&cfg.wafBypass, "waf-bypass", false, "extend scans with WAF bypass payload (default false)")
-
+	flag.StringVar(&cfg.requestType, "request-type", "get", "type (get | post | json) of request")
 	flag.Parse()
+
+	if !stringInSlice(cfg.requestType, []string{"get", "post", "json"}) {
+		log.Fatal(errors.New("[x] invalid request type"))
+	}
 
 	log.Printf("[i] Log4Shell CVE-2021-44228 Vulnerability Scanner %s", version)
 
@@ -64,4 +70,13 @@ func main() {
 	cancel()
 
 	log.Printf("[i] Bye")
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }

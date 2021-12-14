@@ -5,11 +5,13 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strings"
 	"time"
@@ -65,13 +67,52 @@ func request(ctx context.Context, cfg *config) error {
 			binary.BigEndian.PutUint32(ip, i)
 
 			for _, p := range ports {
-				var url string = fmt.Sprintf("%s://%s:%s", cfg.schema, ip, p)
+				u := fmt.Sprintf("%s://%s:%s", cfg.schema, ip, p)
 
-				log.Printf("[i] Checking %s\n", url)
+				log.Printf("[i] Checking %s\n", u)
 
-				req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-				if err != nil {
-					return err
+				var req *http.Request
+				switch cfg.requestType {
+				case "get":
+					req, err = http.NewRequestWithContext(ctx, "GET", u, nil)
+					if err != nil {
+						return err
+					}
+				case "post":
+					fields, err := readFields()
+					if err != nil {
+						return err
+					}
+
+					data := url.Values{}
+					for _, field := range fields {
+						data.Set(field, p)
+					}
+
+					req, err = http.NewRequestWithContext(ctx, "POST", u, strings.NewReader(data.Encode()))
+					if err != nil {
+						return err
+					}
+				case "json":
+					fields, err := readFields()
+					if err != nil {
+						return err
+					}
+
+					values := make(map[string]string)
+					for _, field := range fields {
+						values[field] = p
+					}
+
+					jsonValue, err := json.Marshal(values)
+					if err != nil {
+						return err
+					}
+
+					req, err = http.NewRequestWithContext(ctx, "POST", u, bytes.NewBuffer(jsonValue))
+					if err != nil {
+						return err
+					}
 				}
 
 				req.Header = *header
@@ -82,6 +123,7 @@ func request(ctx context.Context, cfg *config) error {
 					continue
 				}
 				defer response.Body.Close()
+
 			}
 		}
 	}
@@ -144,6 +186,15 @@ func createPayloads(cfg *config) ([]string, error) {
 	}
 
 	return payloads, nil
+}
+
+func readFields() ([]string, error) {
+	data, err := f.ReadFile("resource/fields.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(string(data), "\n"), nil
 }
 
 func init() {
