@@ -21,7 +21,7 @@ Usage of scan4log4shell:
   -no-user-agent-fuzzing
     	exclude User-Agent header from fuzzing (default false)
   -ports string
-    	ports (comma separated) to scan (default 8080) (default "8080")
+    	ports (comma separated) to scan (default "8080")
   -schema string
     	schema to use for requests (default "https")
   -waf-bypass
