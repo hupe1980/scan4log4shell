@@ -4,3 +4,8 @@ Authentication
 X-Requested-With
 X-Forwarded-For
 X-Api-Version
+Accept-Charset
+Accept-Datetime
+Accept-Encoding
+Accept-Language
+Referer

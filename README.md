@@ -15,23 +15,25 @@ Usage of scan4log4shell:
   -caddr string
     	address to catch the callbacks (eg. ip:port)
   -cidr string
-    	subnet to scan (default "192.168.1.0/28")
+    	subnet to scan (default 192.168.1.0/28) (default "192.168.1.0/28")
   -listen
     	start a listener to catch callbacks (default false)
+  -no-user-agent-fuzzing
+    	exclude User-Agent header from fuzzing (default false)
   -ports string
-    	ports (comma separated) to scan (default "8080")
+    	ports (comma separated) to scan (default 8080) (default "8080")
   -schema string
     	schema to use for requests (default "https")
+  -waf-bypass
+    	extend scans with WAF bypass payload (default false)
 ```
 
 ## Example
 ```bash
 make run-test
 
-scanner_1  | 2021/12/14 06:20:06 [i] Log4Shell Vulnerability Scanner dev
-scanner_1  | ---------
+scanner_1  | 2021/12/14 06:20:06 [i] Log4Shell CVE-2021-44228 Vulnerability Scanner dev
 scanner_1  | 2021/12/14 06:20:06 [i] Listening on 172.20.0.30:4444
-scanner_1  | ---------
 scanner_1  | 2021/12/14 06:20:06 [i] Start scanning 172.20.0.0/24 CIDR
 scanner_1  | ---------
 scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.0:8080

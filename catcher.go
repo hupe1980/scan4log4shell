@@ -8,22 +8,22 @@ import (
 	"sync"
 )
 
-func startCatcher(ctx context.Context, callbackAddr string, wg *sync.WaitGroup) {
-	l, err := net.Listen("tcp", callbackAddr)
+func startCatcher(ctx context.Context, cfg *config, wg *sync.WaitGroup) {
+	l, err := net.Listen("tcp", cfg.caddr)
 	if err != nil {
 		log.Printf("Error listening: %v", err.Error())
 		os.Exit(1)
 	}
 	defer l.Close()
 
-	log.Printf("[i] Listening on %s\n---------", callbackAddr)
+	log.Printf("[i] Listening on %s", cfg.caddr)
 
 	wg.Done()
 
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("[i] Stop listening on %s\n", callbackAddr)
+			log.Printf("[i] Stop listening on %s\n", cfg.caddr)
 			return
 		default:
 			conn, err := l.Accept()

