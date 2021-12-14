@@ -1,0 +1,6 @@
+User-Agent
+Bearer
+Authentication
+X-Requested-With
+X-Forwarded-For
+X-Api-Version

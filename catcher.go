@@ -1,15 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"os"
 	"sync"
 )
 
-func startCatcher(callbackAddr string, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func startCatcher(ctx context.Context, callbackAddr string, wg *sync.WaitGroup) {
 	l, err := net.Listen("tcp", callbackAddr)
 	if err != nil {
 		log.Printf("Error listening: %v", err.Error())
@@ -19,13 +18,21 @@ func startCatcher(callbackAddr string, wg *sync.WaitGroup) {
 
 	log.Printf("[i] Listening on %s\n---------", callbackAddr)
 
+	wg.Done()
+
 	for {
-		conn, err := l.Accept()
-		if err != nil {
-			log.Printf("Error accepting: %v", err.Error())
-			os.Exit(1)
+		select {
+		case <-ctx.Done():
+			log.Printf("[i] Stop listening on %s\n", callbackAddr)
+			return
+		default:
+			conn, err := l.Accept()
+			if err != nil {
+				log.Printf("Error accepting: %v", err.Error())
+				os.Exit(1)
+			}
+			go handleRequest(conn)
 		}
-		go handleRequest(conn)
 	}
 }
 

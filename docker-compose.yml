@@ -1,0 +1,25 @@
+version: "3.2"
+networks:
+  test:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+services:
+  vulnapp:
+    build: ./testdata
+    logging:
+      driver: "none"
+    networks:
+      test:
+        ipv4_address: 172.20.0.50
+  
+  scanner:
+    build: .
+    networks:
+      test:
+        ipv4_address: 172.20.0.30
+    command: ["/wait-for-vulnapp.sh", "/scan4log4shell", "--schema", "http", "--cidr", "172.20.0.0/24" ,"--caddr", "172.20.0.30:4444" ,"--listen"]
+    depends_on:
+      - "vulnapp"
+

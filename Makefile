@@ -22,3 +22,11 @@ setup:
 ## test: Runs go test with default values
 test: 
 	@go test -v -race -count=1  ./...
+
+.PHONY: run
+run:
+	@go run *.go -cidr 127.0.0.1/32 --caddr :4444 --listen
+
+.PhONY: run-test
+run-test:
+	@docker-compose up --build

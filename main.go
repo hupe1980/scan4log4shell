@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
+	"embed"
 	"encoding/binary"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
 	"sync"
 	"time"
@@ -16,7 +20,10 @@ import (
 // nolint: gochecknoglobals
 var version = "dev"
 
-func request(destCIDR string, destPorts string, callbackAddr string, listen bool) error {
+//go:embed resource
+var f embed.FS
+
+func request(ctx context.Context, schema string, destCIDR string, destPorts string, callbackAddr string, listen bool) error {
 	log.Printf("[i] Start scanning %s CIDR\n---------", destCIDR)
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
@@ -35,6 +42,11 @@ func request(destCIDR string, destPorts string, callbackAddr string, listen bool
 
 	ports := strings.Split(destPorts, ",")
 
+	headers, err := readHeader()
+	if err != nil {
+		return err
+	}
+
 	_, ipv4Net, err := net.ParseCIDR(destCIDR)
 	if err != nil {
 		return err
@@ -50,22 +62,23 @@ func request(destCIDR string, destPorts string, callbackAddr string, listen bool
 		binary.BigEndian.PutUint32(ip, i)
 
 		for _, p := range ports {
-			var url string = fmt.Sprintf("https://%v:%v", ip, p)
+			var url string = fmt.Sprintf("%s://%s:%s", schema, ip, p)
 
 			log.Printf("[i] Checking %s\n", url)
 
-			req, err := http.NewRequest("GET", url, nil)
+			req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 			if err != nil {
 				return err
 			}
 
-			req.Header.Set("User-Agent", payload)
-			req.Header.Add("Bearer", payload)
-			req.Header.Add("Authentication", payload)
+			for _, h := range headers {
+				if h == "User-Agent" {
+					req.Header.Set("User-Agent", payload)
+					continue
+				}
 
-			req.Header.Add("X-Requested-With", payload)
-			req.Header.Add("X-Forwarded-For", payload)
-			req.Header.Add("X-Api-Version", payload)
+				req.Header.Add(h, payload)
+			}
 
 			response, err := client.Do(req)
 			if err != nil {
@@ -87,6 +100,7 @@ func request(destCIDR string, destPorts string, callbackAddr string, listen bool
 
 func main() {
 	var (
+		schema       string
 		callbackAddr string
 		destCIDR     string
 		destPorts    string
@@ -95,6 +109,7 @@ func main() {
 	)
 
 	flag.StringVar(&callbackAddr, "caddr", "", "address to catch the callbacks (eg. ip:port)")
+	flag.StringVar(&schema, "schema", "https", "schema to use for requests")
 	flag.StringVar(&destCIDR, "cidr", "192.168.1.0/28", "subnet to scan (default 192.168.1.0/28)")
 	flag.StringVar(&destPorts, "ports", "8080", "ports (comma separated) to scan (default 8080)")
 	flag.BoolVar(&listen, "listen", false, "start a listener to catch callbacks (default false)")
@@ -103,15 +118,37 @@ func main() {
 
 	log.Printf("[i] Log4Shell Vulnerability Scanner %s\n---------", version)
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	if listen {
 		wg.Add(1)
-		go startCatcher(callbackAddr, &wg)
+		go startCatcher(ctx, callbackAddr, &wg)
 	}
 
-	err := request(destCIDR, destPorts, callbackAddr, listen)
+	// waiting for catcher
+	wg.Wait()
+
+	err := request(ctx, schema, destCIDR, destPorts, callbackAddr, listen)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	wg.Wait()
+	signalChan := make(chan os.Signal, 1)
+
+	signal.Notify(signalChan, os.Interrupt)
+
+	<-signalChan
+
+	cancel()
+
+	log.Printf("[i] Bye")
+}
+
+func readHeader() ([]string, error) {
+	data, err := f.ReadFile("resource/header.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(string(data), "\n"), nil
 }
