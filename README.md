@@ -22,6 +22,8 @@ Usage of scan4log4shell:
     	exclude User-Agent header from fuzzing (default false)
   -ports string
     	ports (comma separated) to scan (default "8080")
+  -proxy string
+    	proxy url
   -request-type string
     	type (get|post|json) of request (default "get")
   -schema string

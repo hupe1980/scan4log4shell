@@ -23,6 +23,7 @@ type config struct {
 	cidr               string
 	ports              string
 	requestType        string
+	proxy              string
 	listen             bool
 	noUserAgentFuzzing bool
 	wafBypass          bool
@@ -39,6 +40,7 @@ func main() {
 	flag.BoolVar(&cfg.noUserAgentFuzzing, "no-user-agent-fuzzing", false, "exclude User-Agent header from fuzzing (default false)")
 	flag.BoolVar(&cfg.wafBypass, "waf-bypass", false, "extend scans with WAF bypass payload (default false)")
 	flag.StringVar(&cfg.requestType, "request-type", "get", "type (get | post | json) of request")
+	flag.StringVar(&cfg.proxy, "proxy", "", "proxy url")
 	flag.Parse()
 
 	if !stringInSlice(cfg.requestType, []string{"get", "post", "json"}) {

@@ -32,7 +32,16 @@ func request(ctx context.Context, cfg *config) error {
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
 	transport.Proxy = http.ProxyFromEnvironment
+	if cfg.proxy != "" {
+		proxyURL, err := url.Parse(cfg.proxy)
+		if err != nil {
+			return err
+		}
+
+		transport.Proxy = http.ProxyURL(proxyURL)
+	}
 
 	client := &http.Client{
 		Timeout:   time.Millisecond * 75,
