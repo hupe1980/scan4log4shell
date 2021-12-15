@@ -23,7 +23,7 @@ func newRootCmd(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "scan4log4shell",
 		Version:       version,
-		Short:         "Scanner to find log4j log4shell vulnerabilities",
+		Short:         "Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability (CVE-2021-44228)",
 		SilenceErrors: true,
 	}
 

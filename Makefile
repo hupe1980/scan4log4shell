@@ -25,7 +25,7 @@ test:
 
 .PHONY: run
 run:
-	@go run *.go local -h
+	@go run *.go 
 
 .PHONY: run-local
 run-local:

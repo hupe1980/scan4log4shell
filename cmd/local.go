@@ -17,7 +17,7 @@ func newLocalCmd(verbose *bool) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:           "local [paths]",
-		Short:         "Scan for vulnerable log4j versions",
+		Short:         "Detect vulnerable log4j versions on your file-system",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
