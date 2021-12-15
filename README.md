@@ -17,7 +17,7 @@ Usage:
 Available Commands:
   completion  Prints shell autocompletion scripts for scan4log4shell
   help        Help about any command
-  local       Scan for vulnerable log4j versions
+  local       Detect vulnerable log4j versions on your file-system
   remote      Send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
 
 Flags:
