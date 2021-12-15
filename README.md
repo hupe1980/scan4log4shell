@@ -11,34 +11,85 @@ CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2.
 
 ## Usage 
 ```bash
-Usage of scan4log4shell:
-  -caddr string
-    	address to catch the callbacks (eg. ip:port)
-  -cidr string
-    	subnet to scan (default 192.168.1.0/28) (default "192.168.1.0/28")
-  -listen
-    	start a listener to catch callbacks (default false)
-  -no-user-agent-fuzzing
-    	exclude User-Agent header from fuzzing (default false)
-  -ports string
-    	ports (comma separated) to scan (default "8080")
-  -proxy string
-    	proxy url
-  -request-type string
-    	type (get|post|json) of request (default "get")
-  -schema string
-    	schema to use for requests (default "https")
-  -waf-bypass
-    	extend scans with WAF bypass payload (default false)
+Scanner to find log4j log4shell vulnerabilities
+
+Usage:
+  scan4log4shell [command]
+
+Available Commands:
+  completion  Prints shell autocompletion scripts for scan4log4shell
+  help        Help about any command
+  local       Scan for vulnerable log4j versions
+  remote      Send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
+
+Flags:
+  -h, --help      help for scan4log4shell
+  -v, --verbose   print detailed logging messages
+      --version   version for scan4log4shell
+
+Use "scan4log4shell [command] --help" for more information about a command.
 ```
 
-## Example
+## Local
 ```bash
-make run-test
+Scan for vulnerable log4j versions
 
-scanner_1  | 2021/12/14 06:20:06 [i] Log4Shell CVE-2021-44228 Vulnerability Scanner dev
-scanner_1  | 2021/12/14 06:20:06 [i] Listening on 172.20.0.30:4444
-scanner_1  | 2021/12/14 06:20:06 [i] Start scanning CIDR 172.20.0.0/24
+Usage:
+  scan4log4shell local [paths] [flags]
+
+Flags:
+  -h, --help                     help for local
+      --ignore-ext stringArray   ignore .jar | .zip | .war | .ear | .aar
+      --ignore-v1                ignore log4j 1.x versions
+
+Global Flags:
+  -v, --verbose   print detailed logging messages
+```
+
+### Example
+```bash
+make run-local
+
+2021/12/15 23:46:25 [i] Log4Shell CVE-2021-44228 Local Vulnerability Scan
+2021/12/15 23:50:24 [i] Start scanning path ./testdata/filewalk
+---------
+2021/12/15 23:46:25 [i] Inspecting testdata/filewalk/log4j-1.2.8.jar...
+2021/12/15 23:46:25 [!] Log4j V1 identified: /hupe1980/.../log4j-1.2.8.jar
+2021/12/15 23:46:25 [i] Inspecting testdata/filewalk/log4j-api-2.14.0.jar...
+2021/12/15 23:46:25 [i] Inspecting testdata/filewalk/log4j-core-2.14.0.jar...
+2021/12/15 23:46:25 [!] Possibly vulnerable file identified: /hupe1980/.../log4j-core-2.14.0.jar
+2021/12/15 23:46:25 [i] Completed scanning
+
+```
+## Remote
+```
+Send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
+
+Usage:
+  scan4log4shell remote [flags]
+
+Flags:
+      --caddr string            address to catch the callbacks (eg. ip:port)
+      --cidr string             subnet to scan (default "192.168.1.0/28")
+  -h, --help                    help for remote
+      --listen                  start a listener to catch callbacks
+      --no-user-agent-fuzzing   exclude user-agent header from fuzzing
+  -p, --port stringArray        port to scan (default [8080])
+      --proxy string            proxy url
+      --schema string           schema to use for requests (default "https")
+  -t, --type string             get, post or json (default "get")
+      --waf-bypass              extend scans with WAF bypass payload
+
+Global Flags:
+  -v, --verbose   print detailed logging messages
+```
+### Example
+```bash
+make run-remote
+
+scanner_1  | 2021/12/15 22:28:57 [i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan
+scanner_1  | 2021/12/15 22:28:57 [i] Listening on 172.20.0.30:4444
+scanner_1  | 2021/12/15 22:28:57 [i] Start scanning CIDR 172.20.0.0/24
 scanner_1  | ---------
 scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.0:8080
 scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.1:8080

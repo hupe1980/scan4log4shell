@@ -25,8 +25,12 @@ test:
 
 .PHONY: run
 run:
-	@go run *.go -cidr 127.0.0.1/32 --caddr :4444 --listen
+	@go run *.go local -h
 
-.PhONY: run-test
-run-test:
-	@docker-compose up --build
+.PHONY: run-local
+run-local:
+	@go run *.go local -v ./testdata/filewalk
+
+.PhONY: run-remote
+run-remote:
+	@docker-compose -f docker-compose.remote.yml up --build

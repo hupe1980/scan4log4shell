@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -8,28 +8,27 @@ import (
 	"sync"
 )
 
-func startCatcher(ctx context.Context, cfg *config, wg *sync.WaitGroup) {
-	l, err := net.Listen("tcp", cfg.caddr)
+func CatchCallbacks(ctx context.Context, wg *sync.WaitGroup, cfg *RemoteOptions) {
+	l, err := net.Listen("tcp", cfg.CADDR)
 	if err != nil {
 		log.Printf("Error listening: %v", err.Error())
 		os.Exit(1)
 	}
 	defer l.Close()
 
-	log.Printf("[i] Listening on %s", cfg.caddr)
+	log.Printf("[i] Listening on %s", cfg.CADDR)
 
 	wg.Done()
 
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("[i] Stop listening on %s\n", cfg.caddr)
+			log.Printf("[i] Stop listening on %s\n", cfg.CADDR)
 			return
 		default:
 			conn, err := l.Accept()
 			if err != nil {
-				log.Printf("Error accepting: %v", err.Error())
-				os.Exit(1)
+				log.Fatalf("[x] Error accepting: %v", err.Error())
 			}
 			go handleRequest(conn)
 		}
