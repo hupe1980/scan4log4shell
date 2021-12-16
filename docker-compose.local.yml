@@ -1,0 +1,7 @@
+version: "3.2"
+services:
+  scanner:
+    build:
+      context: . 
+      dockerfile: Dockerfile.local
+    command: ["/scan4log4shell", "local", "-v", "/walk"]

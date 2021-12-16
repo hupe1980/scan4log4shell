@@ -15,7 +15,9 @@ services:
         ipv4_address: 172.20.0.50
   
   scanner:
-    build: .
+    build:
+      context: . 
+      dockerfile: Dockerfile.remote
     networks:
       test:
         ipv4_address: 172.20.0.30

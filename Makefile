@@ -29,7 +29,8 @@ run:
 
 .PHONY: run-local
 run-local:
-	@go run *.go local -v ./testdata/filewalk
+	@docker-compose -f docker-compose.local.yml up --build
+#@go run *.go local -v ./testdata/filewalk
 
 .PhONY: run-remote
 run-remote:

@@ -15,6 +15,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -35,7 +37,7 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 	}
 
 	client := &http.Client{
-		Timeout:   time.Millisecond * 75,
+		Timeout:   time.Millisecond * 50,
 		Transport: transport,
 	}
 
@@ -48,6 +50,8 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 	start := binary.BigEndian.Uint32(ipv4Net.IP)
 
 	finish := (start & mask) | (mask ^ 0xffffffff)
+
+	sem := semaphore.NewWeighted(int64(10))
 
 	for i := start; i <= finish; i++ {
 		payloads, err := createPayloads(opts)
@@ -72,6 +76,7 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 				}
 
 				var req *http.Request
+
 				switch opts.RequestType {
 				case "get":
 					req, err = http.NewRequestWithContext(ctx, "GET", u, nil)
@@ -117,13 +122,22 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 
 				req.Header = *header
 
-				response, err := client.Do(req)
+				err := sem.Acquire(ctx, 1)
 				if err != nil {
-					// ignore
-					continue
+					return err
 				}
-				defer response.Body.Close()
 
+				go func() {
+					defer sem.Release(1)
+
+					response, err := client.Do(req)
+					if err != nil {
+						// ignore
+						return
+					}
+
+					response.Body.Close()
+				}()
 			}
 		}
 	}
@@ -142,6 +156,7 @@ func createHTTPHeader(opts *RemoteOptions, payload string) (*http.Header, error)
 	header := &http.Header{}
 
 	var userAgent string
+
 	switch runtime.GOOS {
 	case "windows":
 		userAgent = windowsUserAgent

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hupe1980/log4shellscan/internal"
@@ -23,13 +24,17 @@ func newLocalCmd(verbose *bool) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			log.Printf("[i] Log4Shell CVE-2021-44228 Local Vulnerability Scan")
 
-			internal.FilePathWalk(&internal.LocalOptions{
+			results := internal.FilePathWalk(&internal.LocalOptions{
 				Roots:      args,
 				IgnoreExts: opts.ignoreExts,
 				Verbose:    *verbose,
 			})
 
 			log.Printf("[i] Completed scanning")
+
+			for _, r := range results {
+				fmt.Println(r.Identifier)
+			}
 
 			return nil
 		},

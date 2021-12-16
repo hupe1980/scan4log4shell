@@ -12,11 +12,13 @@ import (
 	"strings"
 )
 
-func FilePathWalk(opts *LocalOptions) {
+func FilePathWalk(opts *LocalOptions) []Result {
+	var results []Result
+
 	for _, root := range opts.Roots {
 		log.Printf("[i] Start scanning path %s\n---------", root)
 
-		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		_ = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				log.Printf("%s: %s\n", path, err)
 				return nil
@@ -44,24 +46,18 @@ func FilePathWalk(opts *LocalOptions) {
 					return nil
 				}
 
-				if _, err := f.Seek(0, os.SEEK_END); err != nil {
-					log.Printf("[x] Cannot seek in %s: %v\n", path, err)
-					return nil
-				}
-
-				inspectJar(path, f, sz, opts)
+				inspectJar(path, f, sz, opts, &results)
 			default:
 				return nil
 			}
 			return nil
 		})
-		if err != nil {
-			log.Printf("Error walking: %v", err.Error())
-		}
 	}
+
+	return results
 }
 
-func inspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions) {
+func inspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions, results *[]Result) {
 	if opts.Verbose {
 		log.Printf("[i] Inspecting %s...\n", path)
 	}
@@ -81,7 +77,11 @@ func inspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions) {
 			}
 
 			if strings.HasSuffix(file.Name, "core/lookup/JndiLookup.class") {
-				lookupJNDIManager(path, zr.File)
+				result := lookupJNDIManager(path, zr.File)
+				if result != nil {
+					*results = append(*results, *result)
+				}
+
 				continue
 			}
 
@@ -96,14 +96,15 @@ func inspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions) {
 			if err != nil {
 				log.Printf("[x] Cannot read JAR file member: %s (%s): %v\n", path, file.Name, err)
 			}
+
 			fr.Close()
 
-			inspectJar(fmt.Sprintf("%s::%s", path, file.Name), bytes.NewReader(buf), int64(len(buf)), opts)
+			inspectJar(fmt.Sprintf("%s::%s", path, file.Name), bytes.NewReader(buf), int64(len(buf)), opts, results)
 		}
 	}
 }
 
-func lookupJNDIManager(path string, zip []*zip.File) {
+func lookupJNDIManager(path string, zip []*zip.File) *Result {
 	for _, file := range zip {
 		if strings.ToLower(filepath.Ext(file.Name)) == ".class" {
 			if strings.HasSuffix(file.Name, "core/net/JndiManager.class") {
@@ -115,6 +116,7 @@ func lookupJNDIManager(path string, zip []*zip.File) {
 
 				buf, err := ioutil.ReadAll(fr)
 				fr.Close()
+
 				if err != nil {
 					log.Printf("Cannot read JAR file member: %s (%s): %v\n", path, file.Name, err)
 					continue
@@ -130,8 +132,16 @@ func lookupJNDIManager(path string, zip []*zip.File) {
 					continue
 				}
 
-				log.Printf("[!] Possibly vulnerable file identified: %s", absFilepath(path))
+				msg := fmt.Sprintf("[!] Possibly vulnerable file identified: %s", absFilepath(path))
+				log.Print(msg)
+
+				return &Result{
+					Identifier: absFilepath(path),
+					Message:    msg,
+				}
 			}
 		}
 	}
+
+	return nil
 }

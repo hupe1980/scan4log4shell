@@ -1,5 +1,8 @@
 FROM golang:1.17-bullseye
-COPY wait-for-vulnapp.sh /wait-for-vulnapp.sh
+
+WORKDIR /walk
+COPY scripts/download-log4j.sh download-log4j.sh
+RUN ./download-log4j.sh
 WORKDIR /app
 COPY go.mod ./
 COPY go.sum ./

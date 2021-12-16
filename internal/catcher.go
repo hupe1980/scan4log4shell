@@ -30,6 +30,7 @@ func CatchCallbacks(ctx context.Context, wg *sync.WaitGroup, cfg *RemoteOptions)
 			if err != nil {
 				log.Fatalf("[x] Error accepting: %v", err.Error())
 			}
+
 			go handleRequest(conn)
 		}
 	}
