@@ -22,6 +22,7 @@ type remoteOptions struct {
 	proxy              string
 	listen             bool
 	noUserAgentFuzzing bool
+	noBasicAuthFuzzing bool
 	noRedirect         bool
 	noWaitTimeout      bool
 	wafBypass          bool
@@ -66,6 +67,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				RequestType:        opts.requestType,
 				Listen:             opts.listen,
 				NoUserAgentFuzzing: opts.noUserAgentFuzzing,
+				NoBasicAuthFuzzing: opts.noBasicAuthFuzzing,
 				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
 				Verbose:            *verbose,
@@ -91,6 +93,8 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 
 			// waiting for starting catcher
 			wg.Wait()
+
+			log.Printf("[i] Start scanning CIDR %s\n---------", opts.cidr)
 
 			err := internal.Request(ctx, remoteOpts)
 			if err != nil {
@@ -132,12 +136,13 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")
 	cmd.Flags().BoolVarP(&opts.listen, "listen", "", false, "start a listener to catch callbacks")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
+	cmd.Flags().BoolVarP(&opts.noBasicAuthFuzzing, "no-basic-auth-fuzzing", "", false, "exclude basic auth from fuzzing")
 	cmd.Flags().BoolVarP(&opts.noRedirect, "no-redirect", "", false, "do not follow redirects")
 	cmd.Flags().BoolVarP(&opts.noWaitTimeout, "no-wait-timeout", "", false, "wait forever for callbacks")
 	cmd.Flags().BoolVarP(&opts.wafBypass, "waf-bypass", "", false, "extend scans with WAF bypass payload ")
 	cmd.Flags().DurationVarP(&opts.wait, "wait", "w", 5*time.Second, "wait time to catch callbacks")
 	cmd.Flags().DurationVarP(&opts.timeout, "timeout", "", 3*time.Second, "time limit for requests")
-	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 50, "max number of concurrent threads")
+	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 150, "max number of concurrent threads")
 
 	return cmd
 }

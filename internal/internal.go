@@ -19,6 +19,7 @@ type RemoteOptions struct {
 	Proxies            []*url.URL
 	Listen             bool
 	NoUserAgentFuzzing bool
+	NoBasicAuthFuzzing bool
 	NoRedirect         bool
 	WafBypass          bool
 	Verbose            bool
@@ -30,7 +31,6 @@ type RemoteOptions struct {
 }
 
 type LocalOptions struct {
-	Roots      []string
 	Excludes   []string
 	IgnoreExts []string
 	IgnoreV1   bool

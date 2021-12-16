@@ -35,12 +35,19 @@ func newLocalCmd(output *string, verbose *bool) *cobra.Command {
 
 			log.Printf("[i] Log4Shell CVE-2021-44228 Local Vulnerability Scan")
 
-			results := internal.FilePathWalk(&internal.LocalOptions{
-				Roots:      args,
-				Excludes:   opts.excludes,
-				IgnoreExts: opts.ignoreExts,
-				Verbose:    *verbose,
-			})
+			results := []internal.Result{}
+
+			for _, root := range args {
+				log.Printf("[i] Start scanning path %s\n---------", root)
+
+				r := internal.FilePathWalk(root, &internal.LocalOptions{
+					Excludes:   opts.excludes,
+					IgnoreExts: opts.ignoreExts,
+					Verbose:    *verbose,
+				})
+
+				results = append(results, r...)
+			}
 
 			log.Printf("[i] Completed scanning")
 

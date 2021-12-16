@@ -12,54 +12,50 @@ import (
 	"strings"
 )
 
-func FilePathWalk(opts *LocalOptions) []Result {
+func FilePathWalk(root string, opts *LocalOptions) []Result {
 	var results []Result
 
-	for _, root := range opts.Roots {
-		log.Printf("[i] Start scanning path %s\n---------", root)
-
-		_ = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				log.Printf("%s: %s\n", path, err)
-				return nil
-			}
-			if info.IsDir() {
-				return nil
-			}
-			if len(opts.Excludes) > 0 {
-				for _, e := range opts.Excludes {
-					if match, _ := filepath.Match(e, path); match {
-						return nil
-					}
-				}
-			}
-
-			switch ext := strings.ToLower(filepath.Ext(path)); ext {
-			case ".jar", ".war", ".ear", ".zip", ".aar":
-				if contains(opts.IgnoreExts, ext) {
-					return nil
-				}
-
-				f, err := os.Open(path)
-				if err != nil {
-					log.Printf("[x] Cannot open %s: %v\n", path, err)
-					return nil
-				}
-				defer f.Close()
-
-				sz, err := f.Seek(0, os.SEEK_END)
-				if err != nil {
-					log.Printf("[x] Cannot seek in %s: %v\n", path, err)
-					return nil
-				}
-
-				inspectJar(path, f, sz, opts, &results)
-			default:
-				return nil
-			}
+	_ = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("%s: %s\n", path, err)
 			return nil
-		})
-	}
+		}
+		if len(opts.Excludes) > 0 {
+			for _, e := range opts.Excludes {
+				if match, _ := filepath.Match(e, path); match {
+					return filepath.SkipDir
+				}
+			}
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		switch ext := strings.ToLower(filepath.Ext(path)); ext {
+		case ".jar", ".war", ".ear", ".zip", ".aar":
+			if contains(opts.IgnoreExts, ext) {
+				return nil
+			}
+
+			f, err := os.Open(path)
+			if err != nil {
+				log.Printf("[x] Cannot open %s: %v\n", path, err)
+				return nil
+			}
+			defer f.Close()
+
+			sz, err := f.Seek(0, os.SEEK_END)
+			if err != nil {
+				log.Printf("[x] Cannot seek in %s: %v\n", path, err)
+				return nil
+			}
+
+			inspectJar(path, f, sz, opts, &results)
+		default:
+			return nil
+		}
+		return nil
+	})
 
 	return results
 }

@@ -103,7 +103,8 @@ Flags:
       --headers-file string     use custom headers from file
   -h, --help                    help for remote
       --listen                  start a listener to catch callbacks
-      --max-threads int         max number of concurrent threads (default 50)
+      --max-threads int         max number of concurrent threads (default 150)
+      --no-basic-auth-fuzzing   exclude basic auth from fuzzing
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
       --no-wait-timeout         wait forever for callbacks

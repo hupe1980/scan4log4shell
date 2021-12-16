@@ -26,8 +26,6 @@ const (
 )
 
 func Request(ctx context.Context, opts *RemoteOptions) error {
-	log.Printf("[i] Start scanning CIDR %s\n---------", opts.CIDR)
-
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
@@ -133,13 +131,33 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 				go func() {
 					defer sem.Release(1)
 
-					response, err := client.Do(req)
+					resp, err := client.Do(req)
 					if err != nil {
 						// ignore
 						return
 					}
 
-					response.Body.Close()
+					resp.Body.Close()
+
+					if !opts.NoBasicAuthFuzzing && resp.StatusCode == http.StatusUnauthorized {
+						auth := resp.Header.Get("WWW-Authenticate")
+
+						if strings.HasPrefix(auth, "Basic") {
+							if opts.Verbose {
+								log.Printf("[i] Checking %s for %s with basic auth\n", payload, u)
+
+								req.SetBasicAuth(payload, payload)
+
+								resp, err := client.Do(req)
+								if err != nil {
+									// ignore
+									return
+								}
+
+								resp.Body.Close()
+							}
+						}
+					}
 				}()
 			}
 		}
