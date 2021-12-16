@@ -41,6 +41,12 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 		Transport: transport,
 	}
 
+	if opts.NoRedirect {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+	}
+
 	_, ipv4Net, err := net.ParseCIDR(opts.CIDR)
 	if err != nil {
 		return err
@@ -59,8 +65,8 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 			return err
 		}
 
-		for _, p := range payloads {
-			header, err := createHTTPHeader(opts, p)
+		for _, payload := range payloads {
+			header, err := createHTTPHeader(opts, payload)
 			if err != nil {
 				return err
 			}
@@ -72,7 +78,7 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 				u := fmt.Sprintf("%s://%s:%s", opts.Schema, ip, p)
 
 				if opts.Verbose {
-					log.Printf("[i] Checking %s\n", u)
+					log.Printf("[i] Checking %s for %s\n", payload, u)
 				}
 
 				var req *http.Request
@@ -119,6 +125,11 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 						return err
 					}
 				}
+
+				// Add payload as query string
+				values := req.URL.Query()
+				values.Add("p", payload)
+				req.URL.RawQuery = values.Encode()
 
 				req.Header = *header
 

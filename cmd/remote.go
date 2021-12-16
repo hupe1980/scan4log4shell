@@ -22,6 +22,7 @@ type remoteOptions struct {
 	proxy              string
 	listen             bool
 	noUserAgentFuzzing bool
+	noRedirect         bool
 	wafBypass          bool
 	wait               time.Duration
 }
@@ -59,6 +60,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				RequestType:        opts.requestType,
 				Listen:             opts.listen,
 				NoUserAgentFuzzing: opts.noUserAgentFuzzing,
+				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
 				Verbose:            *verbose,
 			}
@@ -112,6 +114,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")
 	cmd.Flags().BoolVarP(&opts.listen, "listen", "", false, "start a listener to catch callbacks")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
+	cmd.Flags().BoolVarP(&opts.noRedirect, "no-redirect", "", false, "do not follow redirects")
 	cmd.Flags().BoolVarP(&opts.wafBypass, "waf-bypass", "", false, "extend scans with WAF bypass payload ")
 	cmd.Flags().DurationVarP(&opts.wait, "wait", "w", 5*time.Second, "wait time to catch callbacks")
 

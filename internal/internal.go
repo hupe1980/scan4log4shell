@@ -18,6 +18,7 @@ type RemoteOptions struct {
 	Proxies            []*url.URL
 	Listen             bool
 	NoUserAgentFuzzing bool
+	NoRedirect         bool
 	WafBypass          bool
 	Verbose            bool
 }
