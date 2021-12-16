@@ -7,6 +7,27 @@ CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2.
 - Remote Method Invocation (RMI)
 - Domain Name Service (DNS)
 
+## Installing
+You can install the pre-compiled binary in several different ways
+
+### homebrew tap:
+```bash
+brew tap hupe1980/scan4log4shell
+brew install scan4log4shell
+```
+### scoop:
+```bash
+scoop bucket add scan4log4shell https://github.com/hupe1980/scan4log4shell-bucket.git
+scoop install scan4log4shell
+```
+
+### deb/rpm/apk:
+
+Download the .deb, .rpm or .apk from the [releases page](https://github.com/hupe1980/scan4log4shell/releases) and install them with the appropriate tools.
+
+### manually:
+Download the pre-compiled binaries from the [releases page](https://github.com/hupe1980/scan4log4shell/releases) and copy to the desired location.
+
 ## Usage 
 ```bash
 Usage:
