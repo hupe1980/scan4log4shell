@@ -75,12 +75,16 @@ func inspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions) {
 	for _, file := range zr.File {
 		switch strings.ToLower(filepath.Ext(file.Name)) {
 		case ".class":
-			if strings.HasSuffix(file.Name, "JndiLookup.class") {
-				log.Printf("[!] Possibly vulnerable file identified: %s", absFilepath(path))
-			}
 			if !opts.IgnoreV1 && strings.HasSuffix(file.Name, "log4j/FileAppender.class") {
 				log.Printf("[!] Log4j V1 identified: %s", absFilepath(path))
+				continue
 			}
+
+			if strings.HasSuffix(file.Name, "core/lookup/JndiLookup.class") {
+				lookupJNDIManager(path, zr.File)
+				continue
+			}
+
 		case ".jar", ".war", ".ear", ".zip", ".aar":
 			fr, err := file.Open()
 			if err != nil {
@@ -95,6 +99,39 @@ func inspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions) {
 			fr.Close()
 
 			inspectJar(fmt.Sprintf("%s::%s", path, file.Name), bytes.NewReader(buf), int64(len(buf)), opts)
+		}
+	}
+}
+
+func lookupJNDIManager(path string, zip []*zip.File) {
+	for _, file := range zip {
+		if strings.ToLower(filepath.Ext(file.Name)) == ".class" {
+			if strings.HasSuffix(file.Name, "core/net/JndiManager.class") {
+				fr, err := file.Open()
+				if err != nil {
+					log.Printf("Cannot open JAR file member for reading: %s (%s): %v\n", path, file.Name, err)
+					continue
+				}
+
+				buf, err := ioutil.ReadAll(fr)
+				fr.Close()
+				if err != nil {
+					log.Printf("Cannot read JAR file member: %s (%s): %v\n", path, file.Name, err)
+					continue
+				}
+
+				// v2.16.0
+				if bytes.Contains(buf, []byte("log4j2.enableJndi")) {
+					continue
+				}
+
+				// v2.15.0
+				if bytes.Contains(buf, []byte("Invalid JNDI URI - {}")) {
+					continue
+				}
+
+				log.Printf("[!] Possibly vulnerable file identified: %s", absFilepath(path))
+			}
 		}
 	}
 }
