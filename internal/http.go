@@ -26,24 +26,7 @@ const (
 )
 
 func Request(ctx context.Context, opts *RemoteOptions) error {
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-
-	transport.Proxy = http.ProxyFromEnvironment
-	if len(opts.Proxies) == 1 { // TODO Allow more than one proxy
-		transport.Proxy = http.ProxyURL(opts.Proxies[0])
-	}
-
-	client := &http.Client{
-		Timeout:   opts.Timeout,
-		Transport: transport,
-	}
-
-	if opts.NoRedirect {
-		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		}
-	}
+	client := newHTTPClient(opts)
 
 	_, ipv4Net, err := net.ParseCIDR(opts.CIDR)
 	if err != nil {
@@ -90,7 +73,7 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 				case "post":
 					data := url.Values{}
 					for _, field := range fields {
-						data.Set(field, p)
+						data.Set(field, payload)
 					}
 
 					req, err = http.NewRequestWithContext(ctx, "POST", u, strings.NewReader(data.Encode()))
@@ -100,7 +83,7 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 				case "json":
 					values := make(map[string]string)
 					for _, field := range fields {
-						values[field] = p
+						values[field] = payload
 					}
 
 					jsonValue, err := json.Marshal(values)
@@ -164,6 +147,29 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 	}
 
 	return nil
+}
+
+func newHTTPClient(opts *RemoteOptions) *http.Client {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+	transport.Proxy = http.ProxyFromEnvironment
+	if len(opts.Proxies) == 1 { // TODO Allow more than one proxy
+		transport.Proxy = http.ProxyURL(opts.Proxies[0])
+	}
+
+	client := &http.Client{
+		Timeout:   opts.Timeout,
+		Transport: transport,
+	}
+
+	if opts.NoRedirect {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+	}
+
+	return client
 }
 
 func addHTTPHeader(req *http.Request, payload string, opts *RemoteOptions) error {
