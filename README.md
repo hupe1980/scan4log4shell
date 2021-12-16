@@ -146,7 +146,7 @@ scanner_1  | 2021/12/16 09:57:24 [!] Possibly vulnerable host identified: 172.20
 ```
 
 ### Custom Payload
-If you specify a file with self-created payloads. You can use the following placeholders for the callback address and resource:
+If you specify a file with custom payloads, you can use the following placeholders for callback address and resource:
 - {{ .CADDR }}
 - {{ .Resource }}
 
