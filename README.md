@@ -19,10 +19,10 @@ Available Commands:
   remote      Send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
 
 Flags:
-  -h, --help      help for scan4log4shell
+  -h, --help            help for scan4log4shell
   -o, --output string   output logfile name
-  -v, --verbose   print detailed logging messages
-      --version   version for scan4log4shell
+  -v, --verbose         print detailed logging messages
+      --version         version for scan4log4shell
 
 Use "scan4log4shell [command] --help" for more information about a command.
 ```
@@ -42,7 +42,7 @@ Flags:
 
 Global Flags:
   -o, --output string   output logfile name
-  -v, --verbose   print detailed logging messages
+  -v, --verbose         print detailed logging messages
 ```
 
 ### Example
@@ -90,7 +90,7 @@ Flags:
 
 Global Flags:
   -o, --output string   output logfile name
-  -v, --verbose   print detailed logging messages
+  -v, --verbose         print detailed logging messages
 ```
 ### Example
 ```bash
