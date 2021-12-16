@@ -21,6 +21,9 @@ type RemoteOptions struct {
 	NoRedirect         bool
 	WafBypass          bool
 	Verbose            bool
+	HeadersFile        string
+	FieldsFile         string
+	PayLoadsFile       string
 }
 
 type LocalOptions struct {

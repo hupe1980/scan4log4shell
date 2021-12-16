@@ -23,8 +23,12 @@ type remoteOptions struct {
 	listen             bool
 	noUserAgentFuzzing bool
 	noRedirect         bool
+	noWaitTimeout      bool
 	wafBypass          bool
 	wait               time.Duration
+	headersFile        string
+	fieldsFile         string
+	payloadsFile       string
 }
 
 func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
@@ -63,6 +67,9 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
 				Verbose:            *verbose,
+				HeadersFile:        opts.headersFile,
+				FieldsFile:         opts.fieldsFile,
+				PayLoadsFile:       opts.payloadsFile,
 			}
 
 			if opts.proxy != "" {
@@ -94,9 +101,13 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				signalChan := make(chan os.Signal, 1)
 				signal.Notify(signalChan, os.Interrupt)
 
-				select {
-				case <-signalChan:
-				case <-time.After(opts.wait):
+				if opts.noWaitTimeout {
+					<-signalChan
+				} else {
+					select {
+					case <-signalChan:
+					case <-time.After(opts.wait):
+					}
 				}
 			}
 
@@ -106,6 +117,9 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().StringVarP(&opts.headersFile, "headers-file", "", "", "use custom headers from file")
+	cmd.Flags().StringVarP(&opts.fieldsFile, "fields-file", "", "", "use custom field from file")
+	cmd.Flags().StringVarP(&opts.payloadsFile, "payloads-file", "", "", "use custom payloads from file")
 	cmd.Flags().StringVarP(&opts.schema, "schema", "", "https", "schema to use for requests")
 	cmd.Flags().StringVarP(&opts.caddr, "caddr", "", "", "address to catch the callbacks (eg. ip:port)")
 	cmd.Flags().StringVarP(&opts.cidr, "cidr", "", "192.168.1.0/28", "subnet to scan")
@@ -115,6 +129,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 	cmd.Flags().BoolVarP(&opts.listen, "listen", "", false, "start a listener to catch callbacks")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
 	cmd.Flags().BoolVarP(&opts.noRedirect, "no-redirect", "", false, "do not follow redirects")
+	cmd.Flags().BoolVarP(&opts.noWaitTimeout, "no-wait-timeout", "", false, "wait forever for callbacks")
 	cmd.Flags().BoolVarP(&opts.wafBypass, "waf-bypass", "", false, "extend scans with WAF bypass payload ")
 	cmd.Flags().DurationVarP(&opts.wait, "wait", "w", 5*time.Second, "wait time to catch callbacks")
 
