@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"time"
 
 	"github.com/hupe1980/log4shellscan/internal"
 	"github.com/spf13/cobra"
@@ -22,9 +23,10 @@ type remoteOptions struct {
 	listen             bool
 	noUserAgentFuzzing bool
 	wafBypass          bool
+	wait               time.Duration
 }
 
-func newRemoteCmd(verbose *bool) *cobra.Command {
+func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 	opts := &remoteOptions{}
 
 	cmd := &cobra.Command{
@@ -33,6 +35,15 @@ func newRemoteCmd(verbose *bool) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if *output != "" {
+				f, err := os.Create(*output)
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+				log.SetOutput(f)
+			}
+
 			log.Printf("[i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan")
 
 			ctx, cancel := context.WithCancel(context.Background())
@@ -77,16 +88,17 @@ func newRemoteCmd(verbose *bool) *cobra.Command {
 			if opts.listen {
 				log.Println("[i] Waiting for incoming callbacks!")
 				log.Println("[i] Use ctrl+c to stop the program.")
+
+				signalChan := make(chan os.Signal, 1)
+				signal.Notify(signalChan, os.Interrupt)
+
+				select {
+				case <-signalChan:
+				case <-time.After(opts.wait):
+				}
 			}
 
-			signalChan := make(chan os.Signal, 1)
-			signal.Notify(signalChan, os.Interrupt)
-
-			<-signalChan
-
 			cancel()
-
-			log.Printf("[i] Bye")
 
 			return nil
 		},
@@ -101,6 +113,7 @@ func newRemoteCmd(verbose *bool) *cobra.Command {
 	cmd.Flags().BoolVarP(&opts.listen, "listen", "", false, "start a listener to catch callbacks")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
 	cmd.Flags().BoolVarP(&opts.wafBypass, "waf-bypass", "", false, "extend scans with WAF bypass payload ")
+	cmd.Flags().DurationVarP(&opts.wait, "wait", "w", 5*time.Second, "wait time to catch callbacks")
 
 	return cmd
 }

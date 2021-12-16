@@ -26,6 +26,13 @@ func FilePathWalk(opts *LocalOptions) []Result {
 			if info.IsDir() {
 				return nil
 			}
+			if len(opts.Excludes) > 0 {
+				for _, e := range opts.Excludes {
+					if match, _ := filepath.Match(e, path); match {
+						return nil
+					}
+				}
+			}
 
 			switch ext := strings.ToLower(filepath.Ext(path)); ext {
 			case ".jar", ".war", ".ear", ".zip", ".aar":

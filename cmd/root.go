@@ -18,6 +18,7 @@ func Execute(version string) {
 func newRootCmd(version string) *cobra.Command {
 	var (
 		verbose bool
+		output  string
 	)
 
 	cmd := &cobra.Command{
@@ -28,10 +29,11 @@ func newRootCmd(version string) *cobra.Command {
 	}
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print detailed logging messages")
+	cmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output logfile name")
 
 	cmd.AddCommand(
-		newLocalCmd(&verbose),
-		newRemoteCmd(&verbose),
+		newLocalCmd(&output, &verbose),
+		newRemoteCmd(&output, &verbose),
 		newCompletionCmd(),
 	)
 

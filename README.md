@@ -7,8 +7,6 @@ CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2.
 - Remote Method Invocation (RMI)
 - Domain Name Service (DNS)
 
-:warning: The scanner is still in an early phase.
-
 ## Usage 
 ```bash
 Usage:
@@ -22,6 +20,7 @@ Available Commands:
 
 Flags:
   -h, --help      help for scan4log4shell
+  -o, --output string   output logfile name
   -v, --verbose   print detailed logging messages
       --version   version for scan4log4shell
 
@@ -35,11 +34,14 @@ Usage:
   scan4log4shell local [paths] [flags]
 
 Flags:
+  -e, --exclude stringArray      path to exclude
   -h, --help                     help for local
       --ignore-ext stringArray   ignore .jar | .zip | .war | .ear | .aar
       --ignore-v1                ignore log4j 1.x versions
+      --print-summary            print a summary
 
 Global Flags:
+  -o, --output string   output logfile name
   -v, --verbose   print detailed logging messages
 ```
 
@@ -84,8 +86,10 @@ Flags:
       --schema string           schema to use for requests (default "https")
   -t, --type string             get, post or json (default "get")
       --waf-bypass              extend scans with WAF bypass payload
+  -w, --wait duration           wait time to catch callbacks (default 5s)
 
 Global Flags:
+  -o, --output string   output logfile name
   -v, --verbose   print detailed logging messages
 ```
 ### Example

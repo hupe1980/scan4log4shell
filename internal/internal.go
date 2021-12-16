@@ -24,6 +24,7 @@ type RemoteOptions struct {
 
 type LocalOptions struct {
 	Roots      []string
+	Excludes   []string
 	IgnoreExts []string
 	IgnoreV1   bool
 	Verbose    bool
