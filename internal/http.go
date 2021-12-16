@@ -145,17 +145,17 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 						if strings.HasPrefix(auth, "Basic") {
 							if opts.Verbose {
 								log.Printf("[i] Checking %s for %s with basic auth\n", payload, u)
-
-								req.SetBasicAuth(payload, payload)
-
-								resp, err := client.Do(req)
-								if err != nil {
-									// ignore
-									return
-								}
-
-								resp.Body.Close()
 							}
+
+							req.SetBasicAuth(payload, payload)
+
+							resp, err := client.Do(req)
+							if err != nil {
+								// ignore
+								return
+							}
+
+							resp.Body.Close()
 						}
 					}
 				}()
