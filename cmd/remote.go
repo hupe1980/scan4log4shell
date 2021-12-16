@@ -25,10 +25,12 @@ type remoteOptions struct {
 	noRedirect         bool
 	noWaitTimeout      bool
 	wafBypass          bool
+	timeout            time.Duration
 	wait               time.Duration
 	headersFile        string
 	fieldsFile         string
 	payloadsFile       string
+	maxThreads         int
 }
 
 func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
@@ -70,6 +72,8 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				HeadersFile:        opts.headersFile,
 				FieldsFile:         opts.fieldsFile,
 				PayLoadsFile:       opts.payloadsFile,
+				Timeout:            opts.timeout,
+				MaxThreads:         opts.maxThreads,
 			}
 
 			if opts.proxy != "" {
@@ -132,6 +136,8 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 	cmd.Flags().BoolVarP(&opts.noWaitTimeout, "no-wait-timeout", "", false, "wait forever for callbacks")
 	cmd.Flags().BoolVarP(&opts.wafBypass, "waf-bypass", "", false, "extend scans with WAF bypass payload ")
 	cmd.Flags().DurationVarP(&opts.wait, "wait", "w", 5*time.Second, "wait time to catch callbacks")
+	cmd.Flags().DurationVarP(&opts.timeout, "timeout", "", 3*time.Second, "time limit for requests")
+	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 50, "max number of concurrent threads")
 
 	return cmd
 }

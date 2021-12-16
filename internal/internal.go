@@ -4,6 +4,7 @@ import (
 	"embed"
 	"net/url"
 	"path/filepath"
+	"time"
 )
 
 //go:embed resource
@@ -24,6 +25,8 @@ type RemoteOptions struct {
 	HeadersFile        string
 	FieldsFile         string
 	PayLoadsFile       string
+	Timeout            time.Duration
+	MaxThreads         int
 }
 
 type LocalOptions struct {

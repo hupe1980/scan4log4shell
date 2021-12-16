@@ -17,6 +17,7 @@ func Execute(version string) {
 
 func newRootCmd(version string) *cobra.Command {
 	var (
+		//noColor bool
 		verbose bool
 		output  string
 	)
@@ -28,6 +29,7 @@ func newRootCmd(version string) *cobra.Command {
 		SilenceErrors: true,
 	}
 
+	//cmd.PersistentFlags().BoolVarP(&noColor, "no-color", "", false, "disable color output")
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print detailed logging messages")
 	cmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output logfile name")
 

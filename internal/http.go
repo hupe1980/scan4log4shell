@@ -15,7 +15,6 @@ import (
 	"net/url"
 	"runtime"
 	"strings"
-	"time"
 
 	"golang.org/x/sync/semaphore"
 )
@@ -38,7 +37,7 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 	}
 
 	client := &http.Client{
-		Timeout:   time.Millisecond * 50,
+		Timeout:   opts.Timeout,
 		Transport: transport,
 	}
 
@@ -68,15 +67,10 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 		return err
 	}
 
-	sem := semaphore.NewWeighted(int64(10))
+	sem := semaphore.NewWeighted(int64(opts.MaxThreads))
 
 	for i := start; i <= finish; i++ {
 		for _, payload := range payloads {
-			header, err := createHTTPHeader(opts, payload)
-			if err != nil {
-				return err
-			}
-
 			ip := make(net.IP, 4)
 			binary.BigEndian.PutUint32(ip, i)
 
@@ -127,7 +121,9 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 				values.Add("q", payload)
 				req.URL.RawQuery = values.Encode()
 
-				req.Header = *header
+				if err := addHTTPHeader(req, payload, opts); err != nil {
+					return err
+				}
 
 				err := sem.Acquire(ctx, 1)
 				if err != nil {
@@ -152,13 +148,11 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 	return nil
 }
 
-func createHTTPHeader(opts *RemoteOptions, payload string) (*http.Header, error) {
+func addHTTPHeader(req *http.Request, payload string, opts *RemoteOptions) error {
 	keys, err := readHeaders(opts)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	header := &http.Header{}
 
 	var userAgent string
 
@@ -171,22 +165,27 @@ func createHTTPHeader(opts *RemoteOptions, payload string) (*http.Header, error)
 		userAgent = defaultUserAgent
 	}
 
-	header.Set("User-Agent", userAgent)
+	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("Accept", "*/*")
 
 	for _, h := range keys {
 		if h == "User-Agent" && !opts.NoUserAgentFuzzing {
-			header.Set("User-Agent", payload)
+			req.Header.Set("User-Agent", payload)
 			continue
 		}
 
 		if h == "Referer" {
-			header.Set("Referer", fmt.Sprintf("https://%s", payload))
+			req.Header.Set("Referer", fmt.Sprintf("https://%s", payload))
 		}
 
-		header.Add(h, payload)
+		if h == "Cookie" {
+			req.Header.Set("Cookie", fmt.Sprintf("SessCookie=%s", payload))
+		}
+
+		req.Header.Add(h, payload)
 	}
 
-	return header, nil
+	return nil
 }
 
 func createPayloads(opts *RemoteOptions) ([]string, error) {

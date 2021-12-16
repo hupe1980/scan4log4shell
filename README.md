@@ -103,6 +103,7 @@ Flags:
       --headers-file string     use custom headers from file
   -h, --help                    help for remote
       --listen                  start a listener to catch callbacks
+      --max-threads int         max number of concurrent threads (default 50)
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
       --no-wait-timeout         wait forever for callbacks
@@ -110,6 +111,7 @@ Flags:
   -p, --port stringArray        port to scan (default [8080])
       --proxy string            proxy url
       --schema string           schema to use for requests (default "https")
+      --timeout duration        time limit for requests (default 3s)
   -t, --type string             get, post or json (default "get")
       --waf-bypass              extend scans with WAF bypass payload
   -w, --wait duration           wait time to catch callbacks (default 5s)
