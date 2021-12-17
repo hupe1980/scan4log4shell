@@ -37,6 +37,7 @@ type RemoteOptions struct {
 	FieldsFile         string
 	PayLoadsFile       string
 	Timeout            time.Duration
+	CheckCVE2021_45046 bool
 }
 type RemoteScanner struct {
 	client             *http.Client
@@ -262,6 +263,20 @@ func createPayloads(opts *RemoteOptions) ([]string, error) {
 
 	if opts.WafBypass {
 		t, err := template.ParseFS(f, "resource/bypass.txt")
+		if err != nil {
+			return nil, err
+		}
+
+		p, err := executeTemplate(t, "l4s", opts.CADDR)
+		if err != nil {
+			return nil, err
+		}
+
+		payloads = append(payloads, parseFileContent(p)...)
+	}
+
+	if opts.CheckCVE2021_45046 {
+		t, err := template.ParseFS(f, "resource/cve_2021_45046.txt")
 		if err != nil {
 			return nil, err
 		}

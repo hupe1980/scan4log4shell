@@ -33,6 +33,7 @@ type remoteURLOptions struct {
 	fieldsFile         string
 	payloadsFile       string
 	maxThreads         int
+	checkCVE2021_45046 bool
 }
 
 func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
@@ -82,6 +83,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				FieldsFile:         opts.fieldsFile,
 				PayLoadsFile:       opts.payloadsFile,
 				Timeout:            opts.timeout,
+				CheckCVE2021_45046: opts.checkCVE2021_45046,
 			}
 
 			if opts.proxy != "" {
@@ -216,6 +218,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 	cmd.Flags().DurationVarP(&opts.wait, "wait", "w", 5*time.Second, "wait time to catch callbacks")
 	cmd.Flags().DurationVarP(&opts.timeout, "timeout", "", 3*time.Second, "time limit for requests")
 	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 150, "max number of concurrent threads")
+	cmd.Flags().BoolVarP(&opts.checkCVE2021_45046, "check-cve-2021-45046", "", false, "check for CVE-2021-45046")
 
 	return cmd
 }
