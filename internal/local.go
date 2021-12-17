@@ -11,6 +11,11 @@ import (
 	"strings"
 )
 
+type LocalOptions struct {
+	Excludes   []string
+	IgnoreExts []string
+	IgnoreV1   bool
+}
 type LocalScanner struct {
 	opts     *LocalOptions
 	hitsChan chan string

@@ -41,6 +41,7 @@ Available Commands:
 
 Flags:
   -h, --help            help for scan4log4shell
+      --no-color        disable color output
   -o, --output string   output logfile name
   -v, --verbose         print detailed logging messages
       --version         version for scan4log4shell
@@ -69,25 +70,25 @@ Global Flags:
 ```bash
 make run-local
 
-scanner_1  | 2021/12/16 07:32:25 [i] Log4Shell CVE-2021-44228 Local Vulnerability Scan
-scanner_1  | 2021/12/16 07:32:25 [i] Start scanning path /walk
+scanner_1  | [i] Log4Shell CVE-2021-44228 Local Vulnerability Scan
+scanner_1  | [i] Start scanning path /walk
 scanner_1  | ---------
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-1.2-api-2.14.0-javadoc.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-1.2-api-2.14.0-sources.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-1.2-api-2.14.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0-javadoc.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0-sources.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [!] Possibly vulnerable file identified: /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-api-2.15.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-core-2.15.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-spring-boot-2.15.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.16.0-bin/log4j-api-2.16.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/apache-log4j-2.16.0-bin/log4j-core-2.16.0.jar...
-scanner_1  | 2021/12/16 07:32:25 [i] Inspecting /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar...
-scanner_1  | 2021/12/16 07:32:25 [!] Log4j V1 identified: /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar
-scanner_1  | 2021/12/16 07:32:25 [i] Completed scanning
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-1.2-api-2.14.0-javadoc.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-1.2-api-2.14.0-sources.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-1.2-api-2.14.0.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0-javadoc.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0-sources.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar...
+scanner_1  | [!] Hit: possibly vulnerable file identified: /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-api-2.15.0.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-core-2.15.0.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-spring-boot-2.15.0.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.16.0-bin/log4j-api-2.16.0.jar...
+scanner_1  | [i] Inspecting /walk/apache-log4j-2.16.0-bin/log4j-core-2.16.0.jar...
+scanner_1  | [i] Inspecting /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar...
+scanner_1  | [!] Hit: log4j V1 identified: /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar
+scanner_1  | [i] Completed scanning
 ```
 ## Remote
 Send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
@@ -124,27 +125,27 @@ Global Flags:
 ```bash
 make run-remote
 
-scanner_1  | 2021/12/16 09:57:24 [i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan
-scanner_1  | 2021/12/16 09:57:24 [i] Listening on 172.20.0.30:4444
-scanner_1  | 2021/12/16 09:57:24 [i] Start scanning CIDR 172.20.0.0/24
+scanner_1  | [i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan
+scanner_1  | [i] Listening on 172.20.0.30:4444
+scanner_1  | [i] Start scanning CIDR 172.20.0.0/24
 scanner_1  | ---------
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.0:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.1:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.2:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.3:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.4:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.5:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.6:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.7:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.8:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.9:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.10:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.11:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.12:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.13:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.14:8080
-scanner_1  | 2021/12/16 09:57:24 [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.15:8080
-scanner_1  | 2021/12/16 09:57:24 [!] Possibly vulnerable host identified: 172.20.0.13:60614
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.0:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.1:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.2:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.3:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.4:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.5:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.6:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.7:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.8:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.9:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.10:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.11:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.12:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.13:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.14:8080
+scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.15:8080
+scanner_1  | [!] Possibly vulnerable host identified: 172.20.0.13:60614
 ```
 
 ### Custom Payload

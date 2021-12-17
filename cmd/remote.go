@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"context"
-	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/hupe1980/log4shellscan/internal"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/semaphore"
@@ -37,7 +38,7 @@ type remoteOptions struct {
 	maxThreads         int
 }
 
-func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
+func newRemoteCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
 	opts := &remoteOptions{}
 
 	cmd := &cobra.Command{
@@ -47,15 +48,22 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if *output != "" {
+				color.NoColor = true
 				f, err := os.Create(*output)
 				if err != nil {
 					return err
 				}
 				defer f.Close()
-				log.SetOutput(f)
+
+				logFile = f
+				errFile = f
 			}
 
-			log.Printf("[i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan")
+			if *noColor {
+				color.NoColor = true
+			}
+
+			printInfo("Log4Shell CVE-2021-44228 Remote Vulnerability Scan")
 
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -86,15 +94,29 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				remoteOpts.Proxies = []*url.URL{proxyURL}
 			}
 
+			catcher := internal.NewCallBackCatcher()
+
+			catcher.Handler(func(addr *net.TCPAddr) {
+				printDanger("Possibly vulnerable host identified: %v:%d", addr.IP.String(), addr.Port)
+			})
+
 			if opts.listen {
 				wg.Add(1)
-				go internal.CatchCallbacks(ctx, &wg, remoteOpts)
+				go func() {
+					printInfo("Listening on %s", opts.caddr)
+
+					err := catcher.Listen(ctx, "tcp", opts.caddr, &wg)
+					if err != nil {
+						printError("cannot start callback catcher: %s", err)
+						os.Exit(1)
+					}
+				}()
 			}
 
 			// waiting for starting catcher
 			wg.Wait()
 
-			log.Printf("[i] Start scanning CIDR %s\n---------", opts.cidr)
+			printInfo("Start scanning CIDR %s\n---------", opts.cidr)
 
 			scanner, err := internal.NewRemoteScanner(remoteOpts)
 			if err != nil {
@@ -107,7 +129,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 
 					if strings.HasPrefix(auth, "Basic") {
 						if *verbose {
-							log.Printf("[i] Checking %s for %s with basic auth\n", payload, req.URL.String())
+							printInfo("Checking %s for %s with basic auth\n", payload, req.URL.String())
 						}
 
 						req.SetBasicAuth(payload, payload)
@@ -131,7 +153,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				}
 
 				if *verbose {
-					log.Printf("[i] Checking %s for %s \n", payload, url)
+					printInfo("Checking %s for %s", payload, url)
 				}
 
 				wg.Add(1)
@@ -163,10 +185,10 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				}
 			}
 
-			log.Printf("[i] Completed scanning of CIDR %s\n", opts.cidr)
+			printInfo("Completed scanning of CIDR %s", opts.cidr)
 			if opts.listen {
-				log.Println("[i] Waiting for incoming callbacks!")
-				log.Println("[i] Use ctrl+c to stop the program.")
+				printInfo("[i] Waiting for incoming callbacks!")
+				printInfo("[i] Use ctrl+c to stop the program.")
 
 				signalChan := make(chan os.Signal, 1)
 				signal.Notify(signalChan, os.Interrupt)

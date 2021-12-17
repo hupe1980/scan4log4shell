@@ -4,7 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+)
+
+var (
+	logFile = os.Stdout
+	errFile = os.Stderr
 )
 
 func Execute(version string) {
@@ -17,7 +23,7 @@ func Execute(version string) {
 
 func newRootCmd(version string) *cobra.Command {
 	var (
-		//noColor bool
+		noColor bool
 		verbose bool
 		output  string
 	)
@@ -29,15 +35,30 @@ func newRootCmd(version string) *cobra.Command {
 		SilenceErrors: true,
 	}
 
-	//cmd.PersistentFlags().BoolVarP(&noColor, "no-color", "", false, "disable color output")
+	cmd.PersistentFlags().BoolVarP(&noColor, "no-color", "", false, "disable color output")
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print detailed logging messages")
 	cmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output logfile name")
 
 	cmd.AddCommand(
-		newLocalCmd(&output, &verbose),
-		newRemoteCmd(&output, &verbose),
+		newLocalCmd(&noColor, &output, &verbose),
+		newRemoteCmd(&noColor, &output, &verbose),
 		newCompletionCmd(),
 	)
 
 	return cmd
+}
+
+func printInfo(format string, a ...interface{}) {
+	c := color.New(color.FgCyan)
+	c.Fprintf(logFile, fmt.Sprintf("[i] %s\n", format), a...)
+}
+
+func printDanger(format string, a ...interface{}) {
+	c := color.New(color.FgRed)
+	c.Fprintf(logFile, fmt.Sprintf("[!] %s\n", format), a...)
+}
+
+func printError(format string, a ...interface{}) {
+	c := color.New(color.FgHiRed)
+	c.Fprintf(errFile, fmt.Sprintf("[x] %s\n", format), a...)
 }

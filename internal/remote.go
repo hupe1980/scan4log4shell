@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"runtime"
 	"strings"
+	"time"
 )
 
 const (
@@ -24,6 +25,21 @@ const (
 
 type StatusCodeHandlerFunc func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *RemoteOptions)
 
+type RemoteOptions struct {
+	Schema             string
+	CADDR              string
+	Ports              []string
+	RequestType        string
+	Proxies            []*url.URL
+	NoUserAgentFuzzing bool
+	NoBasicAuthFuzzing bool
+	NoRedirect         bool
+	WafBypass          bool
+	HeadersFile        string
+	FieldsFile         string
+	PayLoadsFile       string
+	Timeout            time.Duration
+}
 type RemoteScanner struct {
 	client             *http.Client
 	payloads           []string
