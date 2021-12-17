@@ -109,7 +109,7 @@ func newLocalCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
 
 	cmd.Flags().BoolVarP(&opts.ignoreV1, "ignore-v1", "", false, "ignore log4j 1.x versions")
 	cmd.Flags().BoolVarP(&opts.checkCVE2021_45046, "check-cve-2021-45046", "", false, "check for CVE-2021-45046")
-	cmd.Flags().BoolVarP(&opts.showSafe, "show-safe", "", false, "show safe versions")
+	cmd.Flags().BoolVarP(&opts.showSafe, "show-safe", "", false, "show cve-2021-44228 safe versions")
 	cmd.Flags().StringArrayVarP(&opts.ignoreExts, "ignore-ext", "", []string{}, "ignore .jar | .zip | .war | .ear | .aar")
 	cmd.Flags().StringArrayVarP(&opts.excludes, "exclude", "e", []string{}, "path to exclude")
 	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 5, "max number of concurrent threads")
