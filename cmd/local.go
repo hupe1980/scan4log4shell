@@ -91,8 +91,6 @@ func newLocalCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
 
 			wg.Wait()
 
-			printError("rererer")
-
 			printInfo("Completed scanning")
 
 			return nil
