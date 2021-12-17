@@ -2,15 +2,19 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/hupe1980/log4shellscan/internal"
 	"github.com/spf13/cobra"
+	"golang.org/x/sync/semaphore"
 )
 
 type remoteOptions struct {
@@ -58,24 +62,21 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 			defer cancel()
 
 			var wg sync.WaitGroup
+			sem := semaphore.NewWeighted(int64(opts.maxThreads))
 
 			remoteOpts := &internal.RemoteOptions{
 				Schema:             opts.schema,
 				CADDR:              opts.caddr,
-				CIDR:               opts.cidr,
 				Ports:              opts.ports,
 				RequestType:        opts.requestType,
-				Listen:             opts.listen,
 				NoUserAgentFuzzing: opts.noUserAgentFuzzing,
 				NoBasicAuthFuzzing: opts.noBasicAuthFuzzing,
 				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
-				Verbose:            *verbose,
 				HeadersFile:        opts.headersFile,
 				FieldsFile:         opts.fieldsFile,
 				PayLoadsFile:       opts.payloadsFile,
 				Timeout:            opts.timeout,
-				MaxThreads:         opts.maxThreads,
 			}
 
 			if opts.proxy != "" {
@@ -96,10 +97,60 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 
 			log.Printf("[i] Start scanning CIDR %s\n---------", opts.cidr)
 
-			err := internal.Request(ctx, remoteOpts)
+			scanner, err := internal.NewRemoteScanner(remoteOpts)
 			if err != nil {
 				return err
 			}
+
+			scanner.StatusCodeHandler(http.StatusUnauthorized, func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *internal.RemoteOptions) {
+				if !opts.NoBasicAuthFuzzing {
+					auth := resp.Header.Get("WWW-Authenticate")
+
+					if strings.HasPrefix(auth, "Basic") {
+						if *verbose {
+							log.Printf("[i] Checking %s for %s with basic auth\n", payload, req.URL.String())
+						}
+
+						req.SetBasicAuth(payload, payload)
+
+						resp, err := client.Do(req)
+						if err != nil {
+							// ignore
+							return
+						}
+
+						resp.Body.Close()
+					}
+				}
+			})
+
+			if err := scanner.CIDRWalk(opts.cidr, func(url, payload string) error {
+				if err := sem.Acquire(ctx, 1); err != nil {
+					return err
+				}
+
+				if *verbose {
+					log.Printf("[i] Checking %s for %s \n", payload, url)
+				}
+
+				wg.Add(1)
+				go func() {
+					defer func() {
+						wg.Done()
+						sem.Release(1)
+					}()
+
+					if err := scanner.Scan(ctx, opts.requestType, url, payload); err != nil {
+						//errchan <- err
+						fmt.Println(err)
+					}
+				}()
+				return nil
+			}); err != nil {
+				return err
+			}
+
+			wg.Wait()
 
 			log.Printf("[i] Completed scanning of CIDR %s\n", opts.cidr)
 			if opts.listen {
@@ -118,8 +169,6 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 					}
 				}
 			}
-
-			cancel()
 
 			return nil
 		},

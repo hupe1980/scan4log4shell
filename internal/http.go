@@ -9,14 +9,11 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"runtime"
 	"strings"
-
-	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -25,10 +22,38 @@ const (
 	darwinUserAgent  = "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
 )
 
-func Request(ctx context.Context, opts *RemoteOptions) error {
-	client := newHTTPClient(opts)
+type StatusCodeHandlerFunc func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *RemoteOptions)
 
-	_, ipv4Net, err := net.ParseCIDR(opts.CIDR)
+type RemoteScanner struct {
+	client             *http.Client
+	payloads           []string
+	fields             []string
+	statusCodeHandlers map[int]StatusCodeHandlerFunc
+	opts               *RemoteOptions
+}
+
+func NewRemoteScanner(opts *RemoteOptions) (*RemoteScanner, error) {
+	p, err := createPayloads(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	f, err := readFields(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RemoteScanner{
+		client:             newHTTPClient(opts),
+		payloads:           p,
+		fields:             f,
+		statusCodeHandlers: make(map[int]StatusCodeHandlerFunc),
+		opts:               opts,
+	}, nil
+}
+
+func (rs *RemoteScanner) CIDRWalk(cidr string, fn func(url, payload string) error) error {
+	_, ipv4Net, err := net.ParseCIDR(cidr)
 	if err != nil {
 		return err
 	}
@@ -38,115 +63,143 @@ func Request(ctx context.Context, opts *RemoteOptions) error {
 
 	finish := (start & mask) | (mask ^ 0xffffffff)
 
-	payloads, err := createPayloads(opts)
-	if err != nil {
-		return err
-	}
-
-	fields, err := readFields(opts)
-	if err != nil {
-		return err
-	}
-
-	sem := semaphore.NewWeighted(int64(opts.MaxThreads))
-
 	for i := start; i <= finish; i++ {
-		for _, payload := range payloads {
-			ip := make(net.IP, 4)
-			binary.BigEndian.PutUint32(ip, i)
+		ip := make(net.IP, 4)
+		binary.BigEndian.PutUint32(ip, i)
 
-			for _, p := range opts.Ports {
-				u := fmt.Sprintf("%s://%s:%s", opts.Schema, ip, p)
+		for _, p := range rs.opts.Ports {
+			url := fmt.Sprintf("%s://%s:%s", rs.opts.Schema, ip, p)
 
-				if opts.Verbose {
-					log.Printf("[i] Checking %s for %s\n", payload, u)
-				}
-
-				var req *http.Request
-
-				switch opts.RequestType {
-				case "get":
-					req, err = http.NewRequestWithContext(ctx, "GET", u, nil)
-					if err != nil {
-						return err
-					}
-				case "post":
-					data := url.Values{}
-					for _, field := range fields {
-						data.Set(field, payload)
-					}
-
-					req, err = http.NewRequestWithContext(ctx, "POST", u, strings.NewReader(data.Encode()))
-					if err != nil {
-						return err
-					}
-				case "json":
-					values := make(map[string]string)
-					for _, field := range fields {
-						values[field] = payload
-					}
-
-					jsonValue, err := json.Marshal(values)
-					if err != nil {
-						return err
-					}
-
-					req, err = http.NewRequestWithContext(ctx, "POST", u, bytes.NewBuffer(jsonValue))
-					if err != nil {
-						return err
-					}
-				}
-
-				// Add payload as query string
-				values := req.URL.Query()
-				values.Add("q", payload)
-				req.URL.RawQuery = values.Encode()
-
-				if err := addHTTPHeader(req, payload, opts); err != nil {
+			for _, p := range rs.payloads {
+				if err := fn(url, p); err != nil {
 					return err
 				}
-
-				err := sem.Acquire(ctx, 1)
-				if err != nil {
-					return err
-				}
-
-				go func() {
-					defer sem.Release(1)
-
-					resp, err := client.Do(req)
-					if err != nil {
-						// ignore
-						return
-					}
-
-					resp.Body.Close()
-
-					if !opts.NoBasicAuthFuzzing && resp.StatusCode == http.StatusUnauthorized {
-						auth := resp.Header.Get("WWW-Authenticate")
-
-						if strings.HasPrefix(auth, "Basic") {
-							if opts.Verbose {
-								log.Printf("[i] Checking %s for %s with basic auth\n", payload, u)
-							}
-
-							req.SetBasicAuth(payload, payload)
-
-							resp, err := client.Do(req)
-							if err != nil {
-								// ignore
-								return
-							}
-
-							resp.Body.Close()
-						}
-					}
-				}()
 			}
 		}
 	}
 
 	return nil
+}
+
+func (rs *RemoteScanner) Scan(ctx context.Context, method, target, payload string) error {
+	req, err := rs.newRequest(ctx, method, target, payload)
+	if err != nil {
+		return err
+	}
+
+	header, err := rs.newHTTPHeader(payload)
+	if err != nil {
+		return err
+	}
+
+	req.Header = header
+
+	resp, err := rs.client.Do(req)
+	if err != nil {
+		// ignore
+		return nil
+	}
+
+	resp.Body.Close()
+
+	if handler, ok := rs.statusCodeHandlers[resp.StatusCode]; ok {
+		handler(rs.client, resp, req, payload, rs.opts)
+	}
+
+	return nil
+}
+
+func (rs *RemoteScanner) StatusCodeHandler(code int, fn StatusCodeHandlerFunc) {
+	rs.statusCodeHandlers[code] = fn
+}
+
+func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload string) (*http.Request, error) {
+	var (
+		req *http.Request
+		err error
+	)
+
+	switch method {
+	case "get":
+		req, err = http.NewRequestWithContext(ctx, "GET", u, nil)
+		if err != nil {
+			return nil, err
+		}
+	case "post":
+		data := url.Values{}
+		for _, field := range rs.fields {
+			data.Set(field, payload)
+		}
+
+		req, err = http.NewRequestWithContext(ctx, "POST", u, strings.NewReader(data.Encode()))
+		if err != nil {
+			return nil, err
+		}
+	case "json":
+		values := make(map[string]string)
+		for _, field := range rs.fields {
+			values[field] = payload
+		}
+
+		jsonValue, err := json.Marshal(values)
+		if err != nil {
+			return nil, err
+		}
+
+		req, err = http.NewRequestWithContext(ctx, "POST", u, bytes.NewBuffer(jsonValue))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Add payload as query string
+	values := req.URL.Query()
+	values.Add("q", payload)
+	req.URL.RawQuery = values.Encode()
+
+	return req, nil
+}
+
+func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {
+	keys, err := readHeaders(rs.opts)
+	if err != nil {
+		return nil, err
+	}
+
+	var userAgent string
+
+	switch runtime.GOOS {
+	case "windows":
+		userAgent = windowsUserAgent
+	case "darwin":
+		userAgent = darwinUserAgent
+	default:
+		userAgent = defaultUserAgent
+	}
+
+	header := make(http.Header)
+
+	header.Set("User-Agent", userAgent)
+	header.Set("Accept", "*/*")
+
+	for _, h := range keys {
+		if h == "User-Agent" && !rs.opts.NoUserAgentFuzzing {
+			header.Set("User-Agent", payload)
+			continue
+		}
+
+		if h == "Referer" {
+			header.Set("Referer", fmt.Sprintf("https://%s", payload))
+		}
+
+		if h == "Cookie" {
+			header.Set("Cookie", fmt.Sprintf("SessCookie=%s", payload))
+		}
+
+		header.Add(h, payload)
+	}
+
+	return header, nil
 }
 
 func newHTTPClient(opts *RemoteOptions) *http.Client {
@@ -170,46 +223,6 @@ func newHTTPClient(opts *RemoteOptions) *http.Client {
 	}
 
 	return client
-}
-
-func addHTTPHeader(req *http.Request, payload string, opts *RemoteOptions) error {
-	keys, err := readHeaders(opts)
-	if err != nil {
-		return err
-	}
-
-	var userAgent string
-
-	switch runtime.GOOS {
-	case "windows":
-		userAgent = windowsUserAgent
-	case "darwin":
-		userAgent = darwinUserAgent
-	default:
-		userAgent = defaultUserAgent
-	}
-
-	req.Header.Set("User-Agent", userAgent)
-	req.Header.Set("Accept", "*/*")
-
-	for _, h := range keys {
-		if h == "User-Agent" && !opts.NoUserAgentFuzzing {
-			req.Header.Set("User-Agent", payload)
-			continue
-		}
-
-		if h == "Referer" {
-			req.Header.Set("Referer", fmt.Sprintf("https://%s", payload))
-		}
-
-		if h == "Cookie" {
-			req.Header.Set("Cookie", fmt.Sprintf("SessCookie=%s", payload))
-		}
-
-		req.Header.Add(h, payload)
-	}
-
-	return nil
 }
 
 func createPayloads(opts *RemoteOptions) ([]string, error) {

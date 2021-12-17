@@ -13,21 +13,17 @@ var f embed.FS
 type RemoteOptions struct {
 	Schema             string
 	CADDR              string
-	CIDR               string
 	Ports              []string
 	RequestType        string
 	Proxies            []*url.URL
-	Listen             bool
 	NoUserAgentFuzzing bool
 	NoBasicAuthFuzzing bool
 	NoRedirect         bool
 	WafBypass          bool
-	Verbose            bool
 	HeadersFile        string
 	FieldsFile         string
 	PayLoadsFile       string
 	Timeout            time.Duration
-	MaxThreads         int
 }
 
 type LocalOptions struct {
