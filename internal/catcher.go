@@ -8,6 +8,7 @@ import (
 type CallbackHandlerFunc func(addr *net.TCPAddr)
 
 type CallbackCatcher struct {
+	quit     chan interface{}
 	listener net.Listener
 	handlers []CallbackHandlerFunc
 }
@@ -20,6 +21,7 @@ func NewCallBackCatcher(network string, address string) (*CallbackCatcher, error
 
 	return &CallbackCatcher{
 		listener: l,
+		quit:     make(chan interface{}),
 		handlers: []CallbackHandlerFunc{},
 	}, nil
 }
@@ -32,7 +34,12 @@ func (cc *CallbackCatcher) Listen(ctx context.Context) error {
 		default:
 			conn, err := cc.listener.Accept()
 			if err != nil {
-				return err
+				select {
+				case <-cc.quit:
+					return nil
+				default:
+					return err
+				}
 			}
 
 			go cc.handleRequest(conn)
@@ -41,6 +48,7 @@ func (cc *CallbackCatcher) Listen(ctx context.Context) error {
 }
 
 func (cc *CallbackCatcher) Close() error {
+	close(cc.quit)
 	return cc.listener.Close()
 }
 
