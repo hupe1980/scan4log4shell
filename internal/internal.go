@@ -30,7 +30,6 @@ type LocalOptions struct {
 	Excludes   []string
 	IgnoreExts []string
 	IgnoreV1   bool
-	Verbose    bool
 }
 
 type Result struct {

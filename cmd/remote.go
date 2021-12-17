@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -124,6 +123,8 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				}
 			})
 
+			errs := make(chan error)
+
 			if err := scanner.CIDRWalk(opts.cidr, func(url, payload string) error {
 				if err := sem.Acquire(ctx, 1); err != nil {
 					return err
@@ -134,6 +135,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				}
 
 				wg.Add(1)
+
 				go func() {
 					defer func() {
 						wg.Done()
@@ -141,8 +143,7 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 					}()
 
 					if err := scanner.Scan(ctx, opts.requestType, url, payload); err != nil {
-						//errchan <- err
-						fmt.Println(err)
+						errs <- err
 					}
 				}()
 				return nil
@@ -150,7 +151,17 @@ func newRemoteCmd(output *string, verbose *bool) *cobra.Command {
 				return err
 			}
 
-			wg.Wait()
+			go func() {
+				wg.Wait()
+				close(errs)
+			}()
+
+			// return the first error
+			for err := range errs {
+				if err != nil {
+					return err
+				}
+			}
 
 			log.Printf("[i] Completed scanning of CIDR %s\n", opts.cidr)
 			if opts.listen {

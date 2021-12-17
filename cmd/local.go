@@ -1,18 +1,21 @@
 package cmd
 
 import (
+	"context"
+	"io"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/hupe1980/log4shellscan/internal"
 	"github.com/spf13/cobra"
+	"golang.org/x/sync/semaphore"
 )
 
 type localOptions struct {
 	excludes   []string
 	ignoreExts []string
 	ignoreV1   bool
-	summary    bool
 }
 
 func newLocalCmd(output *string, verbose *bool) *cobra.Command {
@@ -33,43 +36,60 @@ func newLocalCmd(output *string, verbose *bool) *cobra.Command {
 				log.SetOutput(f)
 			}
 
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			var wg sync.WaitGroup
+			sem := semaphore.NewWeighted(int64(2))
+
 			log.Printf("[i] Log4Shell CVE-2021-44228 Local Vulnerability Scan")
 
-			results := []internal.Result{}
+			scanner := internal.NewLocalScanner(&internal.LocalOptions{
+				Excludes:   opts.excludes,
+				IgnoreExts: opts.ignoreExts,
+			})
+
+			go func() {
+				for hit := range scanner.Hits() {
+					log.Printf("[!] Hit: %s\n", hit)
+				}
+			}()
+
+			go func() {
+				for err := range scanner.Errors() {
+					log.Printf("[x] Error: %s\n", err)
+				}
+			}()
 
 			for _, root := range args {
-				log.Printf("[i] Start scanning path %s\n---------", root)
+				if err := sem.Acquire(ctx, 1); err != nil {
+					return err
+				}
+				wg.Add(1)
+				go func(root string) {
+					defer func() {
+						wg.Done()
+						sem.Release(1)
+					}()
+					scanner.ArchieveWalk(root, func(path string, ra io.ReaderAt, sz int64, opts *internal.LocalOptions) {
+						if *verbose {
+							log.Printf("[i] Inspecting %s\n", path)
+						}
 
-				r := internal.FilePathWalk(root, &internal.LocalOptions{
-					Excludes:   opts.excludes,
-					IgnoreExts: opts.ignoreExts,
-					Verbose:    *verbose,
-				})
-
-				results = append(results, r...)
+						scanner.InspectJar(path, ra, sz, opts)
+					})
+				}(root)
 			}
+
+			wg.Wait()
 
 			log.Printf("[i] Completed scanning")
-
-			if opts.summary {
-				log.Printf("[i] Summary")
-
-				if len(results) == 0 {
-					log.Printf("[i] No vulnable log4j version detected")
-					return nil
-				}
-
-				for _, r := range results {
-					log.Printf(r.Message)
-				}
-			}
 
 			return nil
 		},
 	}
 
 	cmd.Flags().BoolVarP(&opts.ignoreV1, "ignore-v1", "", false, "ignore log4j 1.x versions")
-	cmd.Flags().BoolVarP(&opts.summary, "print-summary", "", false, "print a summary")
 	cmd.Flags().StringArrayVarP(&opts.ignoreExts, "ignore-ext", "", []string{}, "ignore .jar | .zip | .war | .ear | .aar")
 	cmd.Flags().StringArrayVarP(&opts.excludes, "exclude", "e", []string{}, "path to exclude")
 

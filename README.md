@@ -59,7 +59,6 @@ Flags:
   -h, --help                     help for local
       --ignore-ext stringArray   ignore .jar | .zip | .war | .ear | .aar
       --ignore-v1                ignore log4j 1.x versions
-      --print-summary            print a summary
 
 Global Flags:
   -o, --output string   output logfile name
