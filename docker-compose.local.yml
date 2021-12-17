@@ -4,5 +4,5 @@ services:
     build:
       context: . 
       dockerfile: Dockerfile.local
-    command: ["/scan4log4shell", "local", "-v", "--show-safe", "/walk"]
+    command: ["/scan4log4shell", "local", "-v", "--check-cve-2021-45046", "/walk"]
     tty: true

@@ -12,10 +12,11 @@ import (
 )
 
 type LocalOptions struct {
-	Excludes   []string
-	IgnoreExts []string
-	IgnoreV1   bool
-	ShowSafe   bool
+	Excludes           []string
+	IgnoreExts         []string
+	IgnoreV1           bool
+	ShowSafe           bool
+	CheckCVE2021_45046 bool
 }
 type LocalScanner struct {
 	opts      *LocalOptions
@@ -104,7 +105,7 @@ func (ls *LocalScanner) InspectJar(path string, ra io.ReaderAt, sz int64, opts *
 
 			if strings.HasSuffix(file.Name, "core/lookup/JndiLookup.class") {
 				if found := ls.lookupVulnJNDIManager(path, zr.File); found {
-					ls.hitsChan <- fmt.Sprintf("possibly vulnerable file identified: %s", absFilepath(path))
+					ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-44228 vulnerable file identified: %s", absFilepath(path))
 				}
 
 				return
@@ -143,7 +144,9 @@ func (ls *LocalScanner) lookupVulnJNDIManager(path string, zip []*zip.File) bool
 
 				// v2.15.0
 				if bytes.Contains(buf, []byte("Invalid JNDI URI - {}")) {
-					if ls.opts.ShowSafe {
+					if ls.opts.CheckCVE2021_45046 {
+						ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-45046 vulnerable file identified: %s", absFilepath(path))
+					} else if ls.opts.ShowSafe {
 						ls.infosChan <- fmt.Sprintf("log4j v2.15.0 detected: %s", path)
 					}
 
