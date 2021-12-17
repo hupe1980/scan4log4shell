@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"time"
 
@@ -18,24 +17,9 @@ import (
 )
 
 type remoteCIDROptions struct {
-	schema             string
-	caddr              string
-	ports              []string
-	requestType        string
-	proxy              string
-	listen             bool
-	noUserAgentFuzzing bool
-	noBasicAuthFuzzing bool
-	noRedirect         bool
-	noWaitTimeout      bool
-	wafBypass          bool
-	timeout            time.Duration
-	wait               time.Duration
-	headersFile        string
-	fieldsFile         string
-	payloadsFile       string
-	maxThreads         int
-	checkCVE2021_45046 bool
+	remoteOptions
+	schema string
+	ports  []string
 }
 
 func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
@@ -78,7 +62,6 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 				CADDR:              opts.caddr,
 				RequestType:        opts.requestType,
 				NoUserAgentFuzzing: opts.noUserAgentFuzzing,
-				NoBasicAuthFuzzing: opts.noBasicAuthFuzzing,
 				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
 				HeadersFile:        opts.headersFile,
@@ -125,27 +108,13 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 				return err
 			}
 
-			scanner.StatusCodeHandler(http.StatusUnauthorized, func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *internal.RemoteOptions) {
-				if !opts.NoBasicAuthFuzzing {
-					auth := resp.Header.Get("WWW-Authenticate")
+			if opts.basicAuthFuzzing {
+				scanner.StatusCodeHandler(http.StatusUnauthorized, unauthorizedHandler(*verbose))
+			}
 
-					if strings.HasPrefix(auth, "Basic") {
-						if *verbose {
-							printInfo("Checking %s for %s with basic auth\n", payload, req.URL.String())
-						}
-
-						req.SetBasicAuth(payload, payload)
-
-						resp, err := client.Do(req)
-						if err != nil {
-							// ignore
-							return
-						}
-
-						resp.Body.Close()
-					}
-				}
-			})
+			if opts.submitForms {
+				scanner.StatusCodeHandler(http.StatusOK, submitFormHanlder(*verbose))
+			}
 
 			errs := make(chan error)
 
@@ -209,24 +178,9 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.headersFile, "headers-file", "", "", "use custom headers from file")
-	cmd.Flags().StringVarP(&opts.fieldsFile, "fields-file", "", "", "use custom field from file")
-	cmd.Flags().StringVarP(&opts.payloadsFile, "payloads-file", "", "", "use custom payloads from file")
+	addRemoteFlags(cmd, &opts.remoteOptions)
 	cmd.Flags().StringVarP(&opts.schema, "schema", "", "https", "schema to use for requests")
-	cmd.Flags().StringVarP(&opts.caddr, "caddr", "", "", "address to catch the callbacks (eg. ip:port)")
 	cmd.Flags().StringArrayVarP(&opts.ports, "port", "p", []string{"8080"}, "port to scan")
-	cmd.Flags().StringVarP(&opts.requestType, "type", "t", "get", "get, post or json")
-	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")
-	cmd.Flags().BoolVarP(&opts.listen, "listen", "", false, "start a listener to catch callbacks")
-	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
-	cmd.Flags().BoolVarP(&opts.noBasicAuthFuzzing, "no-basic-auth-fuzzing", "", false, "exclude basic auth from fuzzing")
-	cmd.Flags().BoolVarP(&opts.noRedirect, "no-redirect", "", false, "do not follow redirects")
-	cmd.Flags().BoolVarP(&opts.noWaitTimeout, "no-wait-timeout", "", false, "wait forever for callbacks")
-	cmd.Flags().BoolVarP(&opts.wafBypass, "waf-bypass", "", false, "extend scans with WAF bypass payload ")
-	cmd.Flags().DurationVarP(&opts.wait, "wait", "w", 5*time.Second, "wait time to catch callbacks")
-	cmd.Flags().DurationVarP(&opts.timeout, "timeout", "", 3*time.Second, "time limit for requests")
-	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 150, "max number of concurrent threads")
-	cmd.Flags().BoolVarP(&opts.checkCVE2021_45046, "check-cve-2021-45046", "", false, "check for CVE-2021-45046")
 
 	return cmd
 }

@@ -123,21 +123,25 @@ Usage:
   scan4log4shell remote cidr [cidr] [flags]
 
 Flags:
+      --basic-auth-fuzzing      add basic auth to fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
       --check-cve-2021-45046    check for CVE-2021-45046
+      --field stringArray       field to use
       --fields-file string      use custom field from file
+      --header stringArray      header to use
       --headers-file string     use custom headers from file
   -h, --help                    help for cidr
       --listen                  start a listener to catch callbacks
       --max-threads int         max number of concurrent threads (default 150)
-      --no-basic-auth-fuzzing   exclude basic auth from fuzzing
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
       --no-wait-timeout         wait forever for callbacks
+      --payload stringArray     payload to use
       --payloads-file string    use custom payloads from file
   -p, --port stringArray        port to scan (default [8080])
       --proxy string            proxy url
       --schema string           schema to use for requests (default "https")
+      --submit-forms            add form submits to fuzzing
       --timeout duration        time limit for requests (default 3s)
   -t, --type string             get, post or json (default "get")
       --waf-bypass              extend scans with WAF bypass payload
@@ -156,19 +160,23 @@ Usage:
   scan4log4shell remote url [url] [flags]
 
 Flags:
+      --basic-auth-fuzzing      add basic auth to fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
       --check-cve-2021-45046    check for CVE-2021-45046
+      --field stringArray       field to use
       --fields-file string      use custom field from file
+      --header stringArray      header to use
       --headers-file string     use custom headers from file
   -h, --help                    help for url
       --listen                  start a listener to catch callbacks
       --max-threads int         max number of concurrent threads (default 150)
-      --no-basic-auth-fuzzing   exclude basic auth from fuzzing
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
       --no-wait-timeout         wait forever for callbacks
+      --payload stringArray     payload to use
       --payloads-file string    use custom payloads from file
       --proxy string            proxy url
+      --submit-forms            add form submits to fuzzing
       --timeout duration        time limit for requests (default 3s)
   -t, --type string             get, post or json (default "get")
       --waf-bypass              extend scans with WAF bypass payload

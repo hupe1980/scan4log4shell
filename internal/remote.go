@@ -30,12 +30,14 @@ type RemoteOptions struct {
 	RequestType        string
 	Proxies            []*url.URL
 	NoUserAgentFuzzing bool
-	NoBasicAuthFuzzing bool
 	NoRedirect         bool
 	WafBypass          bool
 	HeadersFile        string
+	Headers            []string
 	FieldsFile         string
+	Fields             []string
 	PayLoadsFile       string
+	Payloads           []string
 	Timeout            time.Duration
 	CheckCVE2021_45046 bool
 }
@@ -56,6 +58,10 @@ func NewRemoteScanner(opts *RemoteOptions) (*RemoteScanner, error) {
 	f, err := readFields(opts)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(opts.Fields) > 0 {
+		f = opts.Fields
 	}
 
 	return &RemoteScanner{
@@ -185,6 +191,10 @@ func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {
 		return nil, err
 	}
 
+	if len(rs.opts.Headers) > 0 {
+		keys = rs.opts.Headers
+	}
+
 	var userAgent string
 
 	switch runtime.GOOS {
@@ -245,6 +255,10 @@ func newHTTPClient(opts *RemoteOptions) *http.Client {
 }
 
 func createPayloads(opts *RemoteOptions) ([]string, error) {
+	if len(opts.Payloads) > 0 {
+		return opts.Payloads, nil
+	}
+
 	if opts.PayLoadsFile != "" {
 		t, err := template.ParseFiles(opts.PayLoadsFile)
 		if err != nil {
