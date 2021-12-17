@@ -26,9 +26,7 @@ const (
 type StatusCodeHandlerFunc func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *RemoteOptions)
 
 type RemoteOptions struct {
-	Schema             string
 	CADDR              string
-	Ports              []string
 	RequestType        string
 	Proxies            []*url.URL
 	NoUserAgentFuzzing bool
@@ -68,7 +66,7 @@ func NewRemoteScanner(opts *RemoteOptions) (*RemoteScanner, error) {
 	}, nil
 }
 
-func (rs *RemoteScanner) CIDRWalk(cidr string, fn func(url, payload string) error) error {
+func (rs *RemoteScanner) CIDRWalk(cidr, schema string, ports []string, fn func(url, payload string) error) error {
 	_, ipv4Net, err := net.ParseCIDR(cidr)
 	if err != nil {
 		return err
@@ -83,8 +81,8 @@ func (rs *RemoteScanner) CIDRWalk(cidr string, fn func(url, payload string) erro
 		ip := make(net.IP, 4)
 		binary.BigEndian.PutUint32(ip, i)
 
-		for _, p := range rs.opts.Ports {
-			url := fmt.Sprintf("%s://%s:%s", rs.opts.Schema, ip, p)
+		for _, p := range ports {
+			url := fmt.Sprintf("%s://%s:%s", schema, ip, p)
 
 			for _, p := range rs.payloads {
 				if err := fn(url, p); err != nil {
@@ -174,6 +172,10 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 	req.URL.RawQuery = values.Encode()
 
 	return req, nil
+}
+
+func (rs *RemoteScanner) Payloads() []string {
+	return rs.payloads
 }
 
 func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {

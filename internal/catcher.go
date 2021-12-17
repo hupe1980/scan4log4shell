@@ -3,36 +3,34 @@ package internal
 import (
 	"context"
 	"net"
-	"sync"
 )
 
 type CallbackHandlerFunc func(addr *net.TCPAddr)
 
 type CallbackCatcher struct {
+	listener net.Listener
 	handlers []CallbackHandlerFunc
 }
 
-func NewCallBackCatcher() *CallbackCatcher {
-	return &CallbackCatcher{
-		handlers: []CallbackHandlerFunc{},
-	}
-}
-
-func (cc *CallbackCatcher) Listen(ctx context.Context, network string, address string, wg *sync.WaitGroup) error {
+func NewCallBackCatcher(network string, address string) (*CallbackCatcher, error) {
 	l, err := net.Listen(network, address)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer l.Close()
 
-	wg.Done()
+	return &CallbackCatcher{
+		listener: l,
+		handlers: []CallbackHandlerFunc{},
+	}, nil
+}
 
+func (cc *CallbackCatcher) Listen(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			conn, err := l.Accept()
+			conn, err := cc.listener.Accept()
 			if err != nil {
 				return err
 			}
@@ -40,6 +38,10 @@ func (cc *CallbackCatcher) Listen(ctx context.Context, network string, address s
 			go cc.handleRequest(conn)
 		}
 	}
+}
+
+func (cc *CallbackCatcher) Close() error {
+	return cc.listener.Close()
 }
 
 func (cc *CallbackCatcher) Handler(fn CallbackHandlerFunc) {

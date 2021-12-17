@@ -42,6 +42,7 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.AddCommand(
 		newLocalCmd(&noColor, &output, &verbose),
 		newRemoteCmd(&noColor, &output, &verbose),
+		newCatchCmd(),
 		newCompletionCmd(),
 	)
 
@@ -56,6 +57,11 @@ func printInfo(format string, a ...interface{}) {
 func printDanger(format string, a ...interface{}) {
 	c := color.New(color.FgRed)
 	c.Fprintf(logFile, fmt.Sprintf("[!] %s\n", format), a...)
+}
+
+func printSafe(format string, a ...interface{}) {
+	c := color.New(color.FgGreen)
+	c.Fprintf(logFile, fmt.Sprintf("[i] %s\n", format), a...)
 }
 
 func printError(format string, a ...interface{}) {

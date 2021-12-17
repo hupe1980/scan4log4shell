@@ -34,6 +34,7 @@ Usage:
   scan4log4shell [command]
 
 Available Commands:
+  catch       Start a callback catcher
   completion  Prints shell autocompletion scripts for scan4log4shell
   help        Help about any command
   local       Detect vulnerable log4j versions on your file-system
@@ -60,8 +61,11 @@ Flags:
   -h, --help                     help for local
       --ignore-ext stringArray   ignore .jar | .zip | .war | .ear | .aar
       --ignore-v1                ignore log4j 1.x versions
+      --max-threads int          max number of concurrent threads (default 5)
+      --show-safe                show safe versions
 
 Global Flags:
+      --no-color        disable color output
   -o, --output string   output logfile name
   -v, --verbose         print detailed logging messages
 ```
@@ -90,18 +94,37 @@ scanner_1  | [i] Inspecting /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar..
 scanner_1  | [!] Hit: log4j V1 identified: /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar
 scanner_1  | [i] Completed scanning
 ```
+
 ## Remote
 Send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
 ```
 Usage:
-  scan4log4shell remote [flags]
+  scan4log4shell remote [command]
+
+Available Commands:
+  cidr        Send specially crafted requests to a cidr
+  url         Send specially crafted requests to an url
+
+Flags:
+  -h, --help   help for remote
+
+Global Flags:
+      --no-color        disable color output
+  -o, --output string   output logfile name
+  -v, --verbose         print detailed logging messages
+```
+
+### Remote CIDR
+Send specially crafted requests to a cidr
+```
+Usage:
+  scan4log4shell remote cidr [cidr] [flags]
 
 Flags:
       --caddr string            address to catch the callbacks (eg. ip:port)
-      --cidr string             subnet to scan (default "192.168.1.0/28")
       --fields-file string      use custom field from file
       --headers-file string     use custom headers from file
-  -h, --help                    help for remote
+  -h, --help                    help for cidr
       --listen                  start a listener to catch callbacks
       --max-threads int         max number of concurrent threads (default 150)
       --no-basic-auth-fuzzing   exclude basic auth from fuzzing
@@ -118,6 +141,37 @@ Flags:
   -w, --wait duration           wait time to catch callbacks (default 5s)
 
 Global Flags:
+      --no-color        disable color output
+  -o, --output string   output logfile name
+  -v, --verbose         print detailed logging messages
+```
+
+### Remote url
+Send specially crafted requests to an url
+```
+Usage:
+  scan4log4shell remote url [url] [flags]
+
+Flags:
+      --caddr string            address to catch the callbacks (eg. ip:port)
+      --fields-file string      use custom field from file
+      --headers-file string     use custom headers from file
+  -h, --help                    help for url
+      --listen                  start a listener to catch callbacks
+      --max-threads int         max number of concurrent threads (default 150)
+      --no-basic-auth-fuzzing   exclude basic auth from fuzzing
+      --no-redirect             do not follow redirects
+      --no-user-agent-fuzzing   exclude user-agent header from fuzzing
+      --no-wait-timeout         wait forever for callbacks
+      --payloads-file string    use custom payloads from file
+      --proxy string            proxy url
+      --timeout duration        time limit for requests (default 3s)
+  -t, --type string             get, post or json (default "get")
+      --waf-bypass              extend scans with WAF bypass payload
+  -w, --wait duration           wait time to catch callbacks (default 5s)
+
+Global Flags:
+      --no-color        disable color output
   -o, --output string   output logfile name
   -v, --verbose         print detailed logging messages
 ```

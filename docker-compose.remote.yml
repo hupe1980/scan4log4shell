@@ -29,7 +29,7 @@ services:
     networks:
       test:
         ipv4_address: 172.20.0.30
-    command: ["/wait-for-vulnapp.sh", "/scan4log4shell", "remote", "-v", "--schema", "http", "--cidr", "172.20.0.0/24" ,"--caddr", "172.20.0.30:4444" ,"--listen", "--type", "get"]
+    command: ["/wait-for-vulnapp.sh", "/scan4log4shell", "remote", "cidr", "172.20.0.0/24", "-v", "--schema", "http","--caddr", "172.20.0.30:4444" ,"--listen", "--type", "get"]
     tty: true
     depends_on:
       - "vulnapp-header"
