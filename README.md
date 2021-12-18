@@ -5,7 +5,7 @@
 - Local and remote scanner
 - Support URL and CIDR scans
 - Fuzzing of 50 HTTP request headers by default
-- Fuzzing of HTTP POST Data parameters
+- Fuzzing of HTTP POST data parameters
 - Fuzzing of JSON data parameters
 - Form detection
 - Auth fuzzing (Basic & Bearer)
@@ -75,7 +75,6 @@ Flags:
       --ignore-ext stringArray   ignore .jar | .zip | .war | .ear | .aar
       --ignore-v1                ignore log4j 1.x versions
       --max-threads int          max number of concurrent threads (default 5)
-      --show-safe                show cve-2021-44228 safe versions
 
 Global Flags:
       --no-color        disable color output

@@ -15,7 +15,6 @@ type LocalOptions struct {
 	Excludes           []string
 	IgnoreExts         []string
 	IgnoreV1           bool
-	ShowSafe           bool
 	CheckCVE2021_45046 bool
 }
 type LocalScanner struct {
@@ -88,6 +87,15 @@ func (ls *LocalScanner) ArchieveWalk(root string, fn func(path string, ra io.Rea
 	})
 }
 
+type localScanState struct {
+	isLog4J1                        bool
+	log4jIndicator                  int
+	hasJndiLookup                   bool
+	hasJndiManager                  bool
+	hasCVE2021_44228VulnJndiManager bool
+	hasCVE2021_45046VulnJndiManager bool
+}
+
 func (ls *LocalScanner) InspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions) {
 	zr, err := zip.NewReader(ra, sz)
 	if err != nil {
@@ -95,22 +103,66 @@ func (ls *LocalScanner) InspectJar(path string, ra io.ReaderAt, sz int64, opts *
 		return
 	}
 
+	state := localScanState{}
+
+LOOP:
 	for _, file := range zr.File {
 		switch strings.ToLower(filepath.Ext(file.Name)) {
 		case ".class":
-			if !opts.IgnoreV1 && strings.HasSuffix(file.Name, "log4j/FileAppender.class") {
-				ls.hitsChan <- fmt.Sprintf("log4j V1 identified: %s", absFilepath(path))
-				return
+			if hasSuffix(file.Name, "log4j/DailyRollingFileAppender.class") {
+				state.isLog4J1 = true
+				break LOOP
 			}
 
-			if strings.HasSuffix(file.Name, "core/lookup/JndiLookup.class") {
-				if found := ls.lookupVulnJNDIManager(path, zr.File); found {
-					ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-44228 vulnerable file identified: %s", absFilepath(path))
+			if hasSuffix(file.Name, "core/lookup/JndiLookup.class") {
+				state.hasJndiLookup = true
+				continue
+			}
+
+			if hasSuffix(file.Name, "core/net/JndiManager.class") {
+				state.hasJndiManager = true
+				state.hasCVE2021_44228VulnJndiManager = true
+
+				buf, err := readArchiveMember(file)
+				if err != nil {
+					ls.errsChan <- fmt.Errorf("cannot read JAR file member: %s (%s): %v", path, file.Name, err)
+					return
 				}
 
-				return
+				if bytes.Contains(buf, []byte("log4j2.enableJndi")) { // v2.16.0
+					state.hasCVE2021_44228VulnJndiManager = false
+					state.hasCVE2021_45046VulnJndiManager = false
+				} else if bytes.Contains(buf, []byte("Invalid JNDI URI - {}")) { // v2.15.0
+					state.hasCVE2021_44228VulnJndiManager = false
+					state.hasCVE2021_45046VulnJndiManager = true
+				}
+				continue
 			}
 
+			if hasSuffix(file.Name, "core/LogEvent.class") {
+				state.log4jIndicator++
+				continue
+			}
+
+			if hasSuffix(file.Name, "core/Appender.class") {
+				state.log4jIndicator++
+				continue
+			}
+
+			if hasSuffix(file.Name, "core/Filter.class") {
+				state.log4jIndicator++
+				continue
+			}
+
+			if hasSuffix(file.Name, "core/Layout.class") {
+				state.log4jIndicator++
+				continue
+			}
+
+			if hasSuffix(file.Name, "core/LoggerContext.class") {
+				state.log4jIndicator++
+				continue
+			}
 		case ".jar", ".war", ".ear", ".zip", ".aar":
 			buf, err := readArchiveMember(file)
 			if err != nil {
@@ -121,44 +173,26 @@ func (ls *LocalScanner) InspectJar(path string, ra io.ReaderAt, sz int64, opts *
 			ls.InspectJar(fmt.Sprintf("%s::%s", path, file.Name), bytes.NewReader(buf), int64(len(buf)), opts)
 		}
 	}
-}
 
-func (ls *LocalScanner) lookupVulnJNDIManager(path string, zip []*zip.File) bool {
-	for _, file := range zip {
-		if strings.ToLower(filepath.Ext(file.Name)) == ".class" {
-			if strings.HasSuffix(file.Name, "core/net/JndiManager.class") {
-				buf, err := readArchiveMember(file)
-				if err != nil {
-					ls.errsChan <- fmt.Errorf("cannot read JAR file member: %s (%s): %v", path, file.Name, err)
-					return false
-				}
-
-				// v2.16.0
-				if bytes.Contains(buf, []byte("log4j2.enableJndi")) {
-					if ls.opts.ShowSafe {
-						ls.infosChan <- fmt.Sprintf("log4j >= v2.16.0 detected: %s", path)
-					}
-
-					return false
-				}
-
-				// v2.15.0
-				if bytes.Contains(buf, []byte("Invalid JNDI URI - {}")) {
-					if ls.opts.CheckCVE2021_45046 {
-						ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-45046 vulnerable file identified: %s", absFilepath(path))
-					} else if ls.opts.ShowSafe {
-						ls.infosChan <- fmt.Sprintf("log4j v2.15.0 detected: %s", path)
-					}
-
-					return false
-				}
-
-				return true
-			}
-		}
+	if !opts.IgnoreV1 && state.isLog4J1 {
+		ls.hitsChan <- fmt.Sprintf("log4j V1 identified: %s", absFilepath(path))
+		return
 	}
 
-	return false
+	if state.hasJndiLookup && state.hasCVE2021_44228VulnJndiManager {
+		ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-44228 vulnerable file identified: %s", absFilepath(path))
+		return
+	}
+
+	if ls.opts.CheckCVE2021_45046 && state.hasCVE2021_45046VulnJndiManager {
+		ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-45046 vulnerable file identified: %s", absFilepath(path))
+		return
+	}
+
+	if state.log4jIndicator > 4 && state.hasJndiLookup && !state.hasJndiManager {
+		ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-44228 vulnerable file identified: %s", absFilepath(path))
+		return
+	}
 }
 
 func readArchiveMember(file *zip.File) ([]byte, error) {
@@ -175,4 +209,8 @@ func readArchiveMember(file *zip.File) ([]byte, error) {
 	}
 
 	return buf, nil
+}
+
+func hasSuffix(fileName, suffix string) bool {
+	return strings.HasSuffix(strings.ToLower(fileName), strings.ToLower(suffix))
 }
