@@ -1,6 +1,17 @@
 # scan4log4shell
 > Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
 
+## Features
+- Local and remote scanner
+- Support URL and CIDR scans
+- Fuzzing of 50 HTTP request headers by default
+- Fuzzing of HTTP POST Data parameters
+- Fuzzing of JSON data parameters
+- Form detection
+- Auth fuzzing (Basic & Bearer)
+- WAF Bypass payloads
+
+## Background
 CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2. An unauthenticated, remote attacker could exploit this flaw by sending a specially crafted request to a server running a vulnerable version of log4j. The crafted request uses a Java Naming and Directory Interface (JNDI) injection via a variety of services including:
 - Lightweight Directory Access Protocol (LDAP)
 - Secure LDAP (LDAPS)
