@@ -108,13 +108,6 @@ func (rs *RemoteScanner) Scan(ctx context.Context, method, target, payload strin
 		return err
 	}
 
-	header, err := rs.newHTTPHeader(payload)
-	if err != nil {
-		return err
-	}
-
-	req.Header = header
-
 	resp, err := rs.client.Do(req)
 	if err != nil {
 		// ignore
@@ -140,6 +133,11 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 		err error
 	)
 
+	header, err := rs.newHTTPHeader(payload)
+	if err != nil {
+		return nil, err
+	}
+
 	switch method {
 	case "get":
 		req, err = http.NewRequestWithContext(ctx, "GET", u, nil)
@@ -147,6 +145,8 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 			return nil, err
 		}
 	case "post":
+		header.Set("Content-Type", "application/x-www-form-urlencoded")
+
 		data := url.Values{}
 		for _, field := range rs.fields {
 			data.Set(field, payload)
@@ -157,6 +157,8 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 			return nil, err
 		}
 	case "json":
+		header.Set("Content-Type", "application/json")
+
 		values := make(map[string]string)
 		for _, field := range rs.fields {
 			values[field] = payload
@@ -172,6 +174,8 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 			return nil, err
 		}
 	}
+
+	req.Header = header
 
 	// Add payload as query string
 	values := req.URL.Query()
