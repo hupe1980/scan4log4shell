@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"strings"
@@ -75,7 +76,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 }
 
 var unauthorizedHandler = func(verbose bool) internal.StatusCodeHandlerFunc {
-	return func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *internal.RemoteOptions) {
+	return func(ctx context.Context, client *http.Client, resp *http.Response, req *http.Request, payload string, opts *internal.RemoteOptions) {
 		auth := resp.Header.Get("WWW-Authenticate")
 
 		if strings.HasPrefix(auth, "Basic") {
@@ -97,7 +98,7 @@ var unauthorizedHandler = func(verbose bool) internal.StatusCodeHandlerFunc {
 }
 
 var submitFormHanlder = func(verbose bool) internal.StatusCodeHandlerFunc {
-	return func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *internal.RemoteOptions) {
+	return func(ctx context.Context, client *http.Client, resp *http.Response, req *http.Request, payload string, opts *internal.RemoteOptions) {
 		root, err := html.Parse(resp.Body)
 		if err != nil {
 			//ignore
@@ -106,6 +107,9 @@ var submitFormHanlder = func(verbose bool) internal.StatusCodeHandlerFunc {
 
 		forms := internal.ParseForms(root)
 		if len(forms) == 0 {
+			if verbose {
+				printInfo("No forms found in response from %s/%s", req.URL.Host, req.URL.Path)
+			}
 			return
 		}
 
@@ -132,7 +136,15 @@ var submitFormHanlder = func(verbose bool) internal.StatusCodeHandlerFunc {
 					return
 				}
 
-				resp, err = client.PostForm(actionURL.String(), form.Values)
+				submitReq, err := http.NewRequestWithContext(ctx, form.Method, actionURL.String(), strings.NewReader(form.Values.Encode()))
+				if err != nil {
+					return
+				}
+
+				submitReq.Header = req.Header
+
+				resp, err := client.Do(req)
+				//resp, err = client.PostForm(actionURL.String(), form.Values)
 				if err != nil {
 					// ignore
 					return

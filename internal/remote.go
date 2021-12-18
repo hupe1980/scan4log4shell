@@ -23,7 +23,7 @@ const (
 	darwinUserAgent  = "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
 )
 
-type StatusCodeHandlerFunc func(client *http.Client, resp *http.Response, req *http.Request, payload string, opts *RemoteOptions)
+type StatusCodeHandlerFunc func(ctx context.Context, client *http.Client, resp *http.Response, req *http.Request, payload string, opts *RemoteOptions)
 
 type RemoteOptions struct {
 	CADDR              string
@@ -121,10 +121,10 @@ func (rs *RemoteScanner) Scan(ctx context.Context, method, target, payload strin
 		return nil
 	}
 
-	resp.Body.Close()
+	defer resp.Body.Close()
 
 	if handler, ok := rs.statusCodeHandlers[resp.StatusCode]; ok {
-		handler(rs.client, resp, req, payload, rs.opts)
+		handler(ctx, rs.client, resp, req, payload, rs.opts)
 	}
 
 	return nil
