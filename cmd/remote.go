@@ -133,6 +133,10 @@ var submitFormHanlder = func(verbose bool) internal.StatusCodeHandlerFunc {
 				actionURL = resp.Request.URL.ResolveReference(actionURL)
 
 				if actionURL.Hostname() != req.URL.Host {
+					if verbose {
+						printInfo("Hostname %s out of scope", actionURL.Hostname())
+					}
+
 					return
 				}
 
@@ -142,6 +146,10 @@ var submitFormHanlder = func(verbose bool) internal.StatusCodeHandlerFunc {
 				}
 
 				submitReq.Header = req.Header
+
+				if verbose {
+					printInfo("Checking %s for %s", payload, actionURL)
+				}
 
 				resp, err := client.Do(req)
 				//resp, err = client.PostForm(actionURL.String(), form.Values)
