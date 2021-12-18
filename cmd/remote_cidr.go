@@ -108,7 +108,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 				return err
 			}
 
-			if opts.basicAuthFuzzing {
+			if opts.authFuzzing {
 				scanner.StatusCodeHandler(http.StatusUnauthorized, unauthorizedHandler(*verbose))
 			}
 

@@ -20,7 +20,7 @@ type remoteOptions struct {
 	proxy              string
 	listen             bool
 	noUserAgentFuzzing bool
-	basicAuthFuzzing   bool
+	authFuzzing        bool
 	submitForms        bool
 	noRedirect         bool
 	noWaitTimeout      bool
@@ -62,7 +62,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")
 	cmd.Flags().BoolVarP(&opts.listen, "listen", "", false, "start a listener to catch callbacks")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
-	cmd.Flags().BoolVarP(&opts.basicAuthFuzzing, "basic-auth-fuzzing", "", false, "add basic auth to fuzzing")
+	cmd.Flags().BoolVarP(&opts.authFuzzing, "auth-fuzzing", "", false, "add auth fuzzing")
 	cmd.Flags().BoolVarP(&opts.submitForms, "submit-forms", "", false, "add form submits to fuzzing")
 	cmd.Flags().BoolVarP(&opts.noRedirect, "no-redirect", "", false, "do not follow redirects")
 	cmd.Flags().BoolVarP(&opts.noWaitTimeout, "no-wait-timeout", "", false, "wait forever for callbacks")

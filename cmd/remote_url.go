@@ -105,7 +105,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				return err
 			}
 
-			if opts.basicAuthFuzzing {
+			if opts.authFuzzing {
 				scanner.StatusCodeHandler(http.StatusUnauthorized, unauthorizedHandler(*verbose))
 			}
 

@@ -134,7 +134,7 @@ Usage:
   scan4log4shell remote cidr [cidr] [flags]
 
 Flags:
-      --basic-auth-fuzzing      add basic auth to fuzzing
+      --auth-fuzzing            add auth fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
       --check-cve-2021-45046    check for CVE-2021-45046
       --field stringArray       field to use
@@ -171,7 +171,7 @@ Usage:
   scan4log4shell remote url [url] [flags]
 
 Flags:
-      --basic-auth-fuzzing      add basic auth to fuzzing
+      --auth-fuzzing            add auth fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
       --check-cve-2021-45046    check for CVE-2021-45046
       --field stringArray       field to use
