@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -81,10 +82,24 @@ var unauthorizedHandler = func(verbose bool) internal.StatusCodeHandlerFunc {
 
 		if strings.HasPrefix(auth, "Basic") {
 			if verbose {
-				printInfo("Checking %s for %s with basic auth\n", payload, req.URL.String())
+				printInfo("Checking %s for %s with basic auth", payload, req.URL.String())
 			}
 
 			req.SetBasicAuth(payload, payload)
+
+			resp, err := client.Do(req)
+			if err != nil {
+				// ignore
+				return
+			}
+
+			resp.Body.Close()
+		} else {
+			if verbose {
+				printInfo("Checking %s for %s with bearer", payload, req.URL.String())
+			}
+
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", payload))
 
 			resp, err := client.Do(req)
 			if err != nil {
