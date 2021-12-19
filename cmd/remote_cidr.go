@@ -51,7 +51,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 
 			cidr := args[0]
 
-			printInfo("Log4Shell CVE-2021-44228 Remote Vulnerability Scan")
+			printInfo("Log4Shell Remote Vulnerability Scan")
 
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()

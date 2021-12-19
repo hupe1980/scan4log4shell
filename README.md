@@ -20,6 +20,8 @@ CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2.
 - Domain Name Service (DNS)
 
 :warning: There is a patch bypass on Log4J v2.15.0: [CVE-2021-45046](https://nvd.nist.gov/vuln/detail/CVE-2021-45046) 
+
+:warning: Log4J v2.16 High Severity Vulnerability discovered: [CVE-2021-45105](https://nvd.nist.gov/vuln/detail/CVE-2021-45105)
 ## Installing
 You can install the pre-compiled binary in several different ways
 
@@ -70,9 +72,10 @@ Usage:
   scan4log4shell local [paths] [flags]
 
 Flags:
-      --check-cve-2021-45046     check for CVE-2021-45046
   -e, --exclude stringArray      path to exclude
   -h, --help                     help for local
+      --ignore-cve-2021-45046    ignore CVE-2021-45046
+      --ignore-cve-2021-45105    ignore CVE-2021-45105
       --ignore-ext stringArray   ignore .jar | .zip | .war | .ear | .aar
       --ignore-v1                ignore log4j 1.x versions
       --max-threads int          max number of concurrent threads (default 5)
@@ -97,12 +100,17 @@ scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0-javad
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0-sources.jar...
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-api-2.14.0.jar...
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar...
-scanner_1  | [!] Hit: possibly vulnerable file identified: /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar
+scanner_1  | [!] Hit: possibly CVE-2021-45046 vulnerable file identified: /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar
+scanner_1  | [!] Hit: possibly CVE-2021-45105 vulnerable file identified: /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar
+scanner_1  | [!] Hit: possibly CVE-2021-44228 vulnerable file identified: /walk/apache-log4j-2.14.0-bin/log4j-core-2.14.0.jar
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-api-2.15.0.jar...
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-core-2.15.0.jar...
+scanner_1  | [!] Hit: possibly CVE-2021-45046 vulnerable file identified: /walk/apache-log4j-2.15.0-bin/log4j-core-2.15.0.jar
+scanner_1  | [!] Hit: possibly CVE-2021-45105 vulnerable file identified: /walk/apache-log4j-2.15.0-bin/log4j-core-2.15.0.jar
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.15.0-bin/log4j-spring-boot-2.15.0.jar...
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.16.0-bin/log4j-api-2.16.0.jar...
 scanner_1  | [i] Inspecting /walk/apache-log4j-2.16.0-bin/log4j-core-2.16.0.jar...
+scanner_1  | [!] Hit: possibly CVE-2021-45105 vulnerable file identified: /walk/apache-log4j-2.16.0-bin/log4j-core-2.16.0.jar
 scanner_1  | [i] Inspecting /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar...
 scanner_1  | [!] Hit: log4j V1 identified: /walk/jakarta-log4j-1.2.8/dist/lib/log4j-1.2.8.jar
 scanner_1  | [i] Completed scanning

@@ -48,7 +48,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				color.NoColor = true
 			}
 
-			printInfo("Log4Shell CVE-2021-44228 Remote Vulnerability Scan")
+			printInfo("Log4Shell Remote Vulnerability Scan")
 
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
