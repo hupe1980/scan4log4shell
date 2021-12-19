@@ -4,5 +4,5 @@ services:
     build:
       context: . 
       dockerfile: Dockerfile.local
-    command: ["/scan4log4shell", "local", "/walk"]
+    command: ["/scan4log4shell", "local", "/walk", "-v"]
     tty: true

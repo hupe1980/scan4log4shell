@@ -104,6 +104,10 @@ func (ls *localScanState) IsLog4J1() bool {
 	return ls.isLog4J1
 }
 
+func (ls *localScanState) IsPatched() bool {
+	return ls.IsLog4J2() && !ls.hasJndiLookup
+}
+
 func (ls *localScanState) IsLog4j2_12() bool {
 	return ls.isLog4JGE2_10 && ls.isLog4J2_12_2
 }
@@ -112,17 +116,17 @@ func (ls *localScanState) IsLog4J2() bool {
 	return ls.log4j2Confidence >= 5
 }
 
-func (ls *localScanState) Version() string {
-	if ls.IsLog4J1() {
-		return "log4j V1.x"
-	}
+// func (ls *localScanState) Version() string {
+// 	if ls.IsLog4J1() {
+// 		return "log4j V1.x"
+// 	}
 
-	if ls.IsLog4J2() && !ls.isLog4JGE2_10 {
-		return "log4j >= V2.0-beta9 and < V2.10.0"
-	}
+// 	if ls.IsLog4J2() && !ls.isLog4JGE2_10 {
+// 		return "log4j >= V2.0-beta9 and < V2.10.0"
+// 	}
 
-	return ""
-}
+// 	return ""
+// }
 
 func (ls *localScanState) HasCVE2021_44228() bool {
 	if !ls.IsLog4J2() {
@@ -257,7 +261,8 @@ func (ls *LocalScanner) InspectJar(path string, ra io.ReaderAt, sz int64, opts *
 
 	if state.HasCVE2021_44228() {
 		ls.hitsChan <- fmt.Sprintf("possibly CVE-2021-44228 vulnerable file identified: %s", absFilepath(path))
-		return
+	} else if state.IsPatched() {
+		ls.infosChan <- fmt.Sprintf("possibly CVE-2021-44228 patched (no JndiLookup.class) file identified: %s", absFilepath(path))
 	}
 }
 
