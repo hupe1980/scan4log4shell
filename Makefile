@@ -25,7 +25,7 @@ test:
 
 .PHONY: run
 run:
-	@go run *.go remote cidr -h
+	@go run *.go remote url -h
 
 .PHONY: run-local
 run-local:

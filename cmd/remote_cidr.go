@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -79,18 +78,20 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 				remoteOpts.Proxies = []*url.URL{proxyURL}
 			}
 
-			if opts.listen {
-				catcher, err := internal.NewCallBackCatcher("tcp", opts.caddr)
+			if opts.catcherType != noCatcher {
+				catcher, err := newCatcher(opts.catcherType, opts.caddr)
 				if err != nil {
 					return err
 				}
 				defer catcher.Close()
 
-				catcher.Handler(func(addr *net.TCPAddr) {
-					printDanger("Possibly vulnerable host identified: %v:%d", addr.IP.String(), addr.Port)
+				remoteOpts.CADDR = catcher.Addr()
+
+				catcher.Handler(func(remoteAddr string) {
+					printDanger("Possibly vulnerable host identified: %v", remoteAddr)
 				})
 
-				printInfo("Listening on %s", opts.caddr)
+				printInfo("Listening on %s", catcher.Addr())
 
 				go func() {
 					err := catcher.Listen(ctx)
@@ -157,9 +158,9 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 			}
 
 			printInfo("Completed scanning of CIDR %s", cidr)
-			if opts.listen {
-				printInfo("[i] Waiting for incoming callbacks!")
-				printInfo("[i] Use ctrl+c to stop the program.")
+			if opts.catcherType != noCatcher {
+				printInfo("Waiting for incoming callbacks!")
+				printInfo("Use ctrl+c to stop the program.")
 
 				signalChan := make(chan os.Signal, 1)
 				signal.Notify(signalChan, os.Interrupt)

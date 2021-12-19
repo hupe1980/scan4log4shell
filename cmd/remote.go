@@ -14,11 +14,15 @@ import (
 	"golang.org/x/net/html"
 )
 
+const (
+	noCatcher = "none"
+)
+
 type remoteOptions struct {
 	caddr              string
 	requestType        string
 	proxy              string
-	listen             bool
+	catcherType        string
 	noUserAgentFuzzing bool
 	authFuzzing        bool
 	submitForms        bool
@@ -60,7 +64,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringVarP(&opts.caddr, "caddr", "", "", "address to catch the callbacks (eg. ip:port)")
 	cmd.Flags().StringVarP(&opts.requestType, "type", "t", "get", "get, post or json")
 	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")
-	cmd.Flags().BoolVarP(&opts.listen, "listen", "", false, "start a listener to catch callbacks")
+	cmd.Flags().StringVarP(&opts.catcherType, "catcher-type", "", "dns", "type of callback catcher (dns | tcp | none)")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
 	cmd.Flags().BoolVarP(&opts.authFuzzing, "auth-fuzzing", "", false, "add auth fuzzing")
 	cmd.Flags().BoolVarP(&opts.submitForms, "submit-forms", "", false, "add form submits to fuzzing")

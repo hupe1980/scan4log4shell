@@ -4,10 +4,11 @@
 ## Features
 - Local and remote scanner
 - Support URL and CIDR scans
+- Supports DNS & TCP callbacks for vulnerability discovery and validation
 - Fuzzing of 50 HTTP request headers by default
 - Fuzzing of HTTP POST data parameters
 - Fuzzing of JSON data parameters
-- Form detection
+- HTTP Form fuzzing
 - Auth fuzzing (Basic & Bearer)
 - WAF Bypass payloads
 
@@ -135,13 +136,13 @@ Usage:
 Flags:
       --auth-fuzzing            add auth fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
+      --catcher-type string     type of callback catcher (dns | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046
       --field stringArray       field to use
       --fields-file string      use custom field from file
       --header stringArray      header to use
       --headers-file string     use custom headers from file
   -h, --help                    help for cidr
-      --listen                  start a listener to catch callbacks
       --max-threads int         max number of concurrent threads (default 150)
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
@@ -172,13 +173,13 @@ Usage:
 Flags:
       --auth-fuzzing            add auth fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
+      --catcher-type string     type of callback catcher (dns | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046
       --field stringArray       field to use
       --fields-file string      use custom field from file
       --header stringArray      header to use
       --headers-file string     use custom headers from file
   -h, --help                    help for url
-      --listen                  start a listener to catch callbacks
       --max-threads int         max number of concurrent threads (default 150)
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
