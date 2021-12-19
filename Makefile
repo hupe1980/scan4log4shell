@@ -4,15 +4,6 @@ PROJECTNAME=$(shell basename "$(PWD)")
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-.PHONY: help
-## help: Prints this help message
-help: Makefile
-	@echo
-	@echo " Choose a command run in "$(PROJECTNAME)":"
-	@echo
-	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
-	@echo
-
 .PHONY: setup
 ## setup: Setup installes dependencies
 setup:
@@ -34,3 +25,12 @@ run-local:
 .PhONY: run-remote
 run-remote:
 	@docker-compose -f docker-compose.remote.yml up --build
+
+.PHONY: help
+## help: Prints this help message
+help: Makefile
+	@echo
+	@echo " Choose a command run in "$(PROJECTNAME)":"
+	@echo
+	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
+	@echo
