@@ -23,10 +23,11 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 	opts := &remoteURLOptions{}
 
 	cmd := &cobra.Command{
-		Use:   "url [url]",
+		Use:   "url [urls]",
 		Short: "Send specially crafted requests to an url",
 		Args:  cobra.MinimumNArgs(1),
 		Example: `- Scan a url: scan4log4shell remote url https://target.org
+- Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -46,8 +47,6 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 			if *noColor {
 				color.NoColor = true
 			}
-
-			targetURL := args[0]
 
 			printInfo("Log4Shell CVE-2021-44228 Remote Vulnerability Scan")
 
@@ -101,8 +100,6 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				}()
 			}
 
-			printInfo("Start scanning CIDR %s\n---------", targetURL)
-
 			scanner, err := internal.NewRemoteScanner(remoteOpts)
 			if err != nil {
 				return err
@@ -118,27 +115,33 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 
 			errs := make(chan error)
 
-			for _, payload := range scanner.Payloads() {
-				if err := sem.Acquire(ctx, 1); err != nil {
-					return err
-				}
+			for _, targetURL := range args {
+				printInfo("Start scanning CIDR %s\n---------", targetURL)
 
-				if *verbose {
-					printInfo("Checking %s for %s", payload, targetURL)
-				}
-
-				wg.Add(1)
-
-				go func(payload string) {
-					defer func() {
-						wg.Done()
-						sem.Release(1)
-					}()
-
-					if err := scanner.Scan(ctx, opts.requestType, targetURL, payload); err != nil {
-						errs <- err
+				for _, payload := range scanner.Payloads() {
+					if err := sem.Acquire(ctx, 1); err != nil {
+						return err
 					}
-				}(payload)
+
+					if *verbose {
+						printInfo("Checking %s for %s", payload, targetURL)
+					}
+
+					wg.Add(1)
+
+					go func(targetURL, payload string) {
+						defer func() {
+							wg.Done()
+							sem.Release(1)
+						}()
+
+						if err := scanner.Scan(ctx, opts.requestType, targetURL, payload); err != nil {
+							errs <- err
+						}
+					}(targetURL, payload)
+				}
+
+				printInfo("All request to %s have been sent", targetURL)
 			}
 
 			go func() {
@@ -153,7 +156,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				}
 			}
 
-			printInfo("Completed scanning of CIDR %s", targetURL)
+			printInfo("Completed scanning")
 			if opts.catcherType != noCatcher {
 				printInfo("Waiting for incoming callbacks!")
 				printInfo("Use ctrl+c to stop the program.")

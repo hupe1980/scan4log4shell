@@ -172,10 +172,11 @@ Global Flags:
 Send specially crafted requests to an url
 ```
 Usage:
-  scan4log4shell remote url [url] [flags]
+  scan4log4shell remote url [urls] [flags]
 
 Examples:
 - Scan a url: scan4log4shell remote url https://target.org
+- Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 
 Flags:
