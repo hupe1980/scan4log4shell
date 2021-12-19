@@ -133,6 +133,10 @@ Send specially crafted requests to a cidr
 Usage:
   scan4log4shell remote cidr [cidr] [flags]
 
+Examples:
+- Scan a complete cidr: scan4log4shell remote cidr 172.20.0.0/24
+- TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444
+
 Flags:
       --auth-fuzzing            add auth fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
@@ -169,6 +173,10 @@ Send specially crafted requests to an url
 ```
 Usage:
   scan4log4shell remote url [url] [flags]
+
+Examples:
+- Scan a url: scan4log4shell remote url https://target.org
+- TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 
 Flags:
       --auth-fuzzing            add auth fuzzing

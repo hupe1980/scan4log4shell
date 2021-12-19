@@ -23,9 +23,11 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 	opts := &remoteURLOptions{}
 
 	cmd := &cobra.Command{
-		Use:           "url [url]",
-		Short:         "Send specially crafted requests to an url",
-		Args:          cobra.MinimumNArgs(1),
+		Use:   "url [url]",
+		Short: "Send specially crafted requests to an url",
+		Args:  cobra.MinimumNArgs(1),
+		Example: `- Scan a url: scan4log4shell remote url https://target.org
+- TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
