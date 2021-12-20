@@ -44,7 +44,7 @@ Download the .deb, .rpm or .apk from the [releases page](https://github.com/hupe
 Download the pre-compiled binaries from the [releases page](https://github.com/hupe1980/scan4log4shell/releases) and copy to the desired location.
 
 ## Usage 
-```bash
+```console
 Usage:
   scan4log4shell [command]
 
@@ -67,7 +67,7 @@ Use "scan4log4shell [command] --help" for more information about a command.
 
 ## Local
 Detect vulnerable log4j versions on your file-system
-```bash
+```console
 Usage:
   scan4log4shell local [paths] [flags]
 
@@ -118,7 +118,7 @@ scanner_1  | [i] Completed scanning
 
 ## Remote
 Send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
-```
+```console
 Usage:
   scan4log4shell remote [command]
 
@@ -137,7 +137,7 @@ Global Flags:
 
 ### Remote CIDR
 Send specially crafted requests to a cidr
-```
+```console
 Usage:
   scan4log4shell remote cidr [cidr] [flags]
 
@@ -178,7 +178,7 @@ Global Flags:
 
 ### Remote url
 Send specially crafted requests to an url
-```
+```console
 Usage:
   scan4log4shell remote url [urls] [flags]
 
