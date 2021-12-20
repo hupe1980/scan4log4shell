@@ -20,13 +20,13 @@ Date
 # Expect
 Forwarded
 From
-Host
-#HTTP2-Settings
-#If-Match
-#If-Modified-Since
-#If-None-Match
-#If-Range
-#If-Unmodified-Since
+# Host
+# HTTP2-Settings
+# If-Match
+# If-Modified-Since
+# If-None-Match
+# If-Range
+# If-Unmodified-Since
 Max-Forwards
 Origin
 Pragma
