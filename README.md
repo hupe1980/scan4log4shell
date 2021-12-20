@@ -256,6 +256,7 @@ You can find more examples [here](internal/resource/bypass.txt)
 
 ## References
 - https://gist.github.com/SwitHak/b66db3a06c2955a9cb71a8718970c592
+- https://logging.apache.org/log4j/2.x/security.html
 - https://nvd.nist.gov/vuln/detail/CVE-2021-44228
 - https://nvd.nist.gov/vuln/detail/CVE-2021-45046
 - https://nvd.nist.gov/vuln/detail/CVE-2021-45105
