@@ -225,10 +225,12 @@ func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {
 
 		if h == "Referer" {
 			header.Set("Referer", fmt.Sprintf("https://%s", payload))
+			continue
 		}
 
 		if h == "Cookie" {
 			header.Set("Cookie", fmt.Sprintf("SessCookie=%s", payload))
+			continue
 		}
 
 		header.Add(h, payload)
