@@ -216,6 +216,8 @@ func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {
 	header.Set("Accept", "*/*")
 
 	for _, h := range keys {
+		h = http.CanonicalHeaderKey(h)
+
 		if h == "User-Agent" && !rs.opts.NoUserAgentFuzzing {
 			header.Set("User-Agent", payload)
 			continue
