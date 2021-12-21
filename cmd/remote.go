@@ -77,8 +77,8 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().DurationVarP(&opts.timeout, "timeout", "", 3*time.Second, "time limit for requests")
 	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 150, "max number of concurrent threads")
 	cmd.Flags().BoolVarP(&opts.checkCVE2021_45046, "check-cve-2021-45046", "", false, "check for CVE-2021-45046")
-	cmd.Flags().StringArrayVarP(&opts.headers, "header", "", []string{""}, "header to use")
-	cmd.Flags().StringArrayVarP(&opts.fields, "field", "", []string{""}, "field to use")
+	cmd.Flags().StringArrayVarP(&opts.headers, "header", "", nil, "header to use")
+	cmd.Flags().StringArrayVarP(&opts.fields, "field", "", nil, "field to use")
 	cmd.Flags().StringArrayVarP(&opts.payloads, "payload", "", nil, "payload to use")
 }
 
