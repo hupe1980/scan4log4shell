@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"time"
 
@@ -62,13 +63,17 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 
 			remoteOpts := &internal.RemoteOptions{
 				CADDR:              opts.caddr,
-				RequestType:        opts.requestType,
+				Resource:           opts.resource,
+				RequestType:        strings.ToLower(opts.requestType),
 				NoUserAgentFuzzing: opts.noUserAgentFuzzing,
 				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
 				HeadersFile:        opts.headersFile,
+				Headers:            opts.headers,
 				FieldsFile:         opts.fieldsFile,
+				Fields:             opts.fields,
 				PayLoadsFile:       opts.payloadsFile,
+				Payloads:           opts.payloads,
 				Timeout:            opts.timeout,
 				CheckCVE2021_45046: opts.checkCVE2021_45046,
 			}
@@ -82,7 +87,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 			}
 
 			if opts.catcherType != noCatcher {
-				catcher, err := newCatcher(opts.catcherType, opts.caddr)
+				catcher, err := newCatcher(strings.ToLower(opts.catcherType), opts.caddr)
 				if err != nil {
 					return err
 				}

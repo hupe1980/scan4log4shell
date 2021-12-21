@@ -164,6 +164,7 @@ Flags:
       --payloads-file string    use custom payloads from file
   -p, --port stringArray        port to scan (default [8080])
       --proxy string            proxy url
+  -r, --resource string         resource in payload (default "l4s")
       --schema string           schema to use for requests (default "https")
       --submit-forms            add form submits to fuzzing
       --timeout duration        time limit for requests (default 3s)
@@ -206,6 +207,7 @@ Flags:
       --payload stringArray     payload to use
       --payloads-file string    use custom payloads from file
       --proxy string            proxy url
+  -r, --resource string         resource in payload (default "l4s")
       --submit-forms            add form submits to fuzzing
       --timeout duration        time limit for requests (default 3s)
   -t, --type string             get, post or json (default "get")

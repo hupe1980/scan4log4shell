@@ -16,7 +16,7 @@ test:
 
 .PHONY: run
 run:
-	@go run *.go local -h
+	@go run *.go remote url -h
 
 .PHONY: run-local
 run-local:

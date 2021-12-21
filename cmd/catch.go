@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hupe1980/log4shellscan/internal"
 	"github.com/spf13/cobra"
@@ -24,7 +25,7 @@ func newCatchCmd() *cobra.Command {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			catcherType := args[0]
+			catcherType := strings.ToLower(args[0])
 
 			catcher, err := newCatcher(catcherType, caddr)
 			if err != nil {
