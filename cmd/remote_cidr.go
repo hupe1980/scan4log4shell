@@ -29,7 +29,8 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 		Short: "Send specially crafted requests to a cidr",
 		Args:  cobra.MinimumNArgs(1),
 		Example: `- Scan a complete cidr: scan4log4shell remote cidr 172.20.0.0/24
-- TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444`,
+- TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444
+- Custom headers file: scan4log4shell remote cidr 172.20.0.0/24 --headers-file ./headers.txt`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {

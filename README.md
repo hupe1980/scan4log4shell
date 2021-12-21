@@ -2,15 +2,15 @@
 > Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
 
 ## Features
-- Local and remote scanner
-- Support URL and CIDR scans
+- [Local](#local) and [remote](#remote) scanner
+- Supports URL and CIDR scans
 - Supports DNS & TCP callbacks for vulnerability discovery and validation
-- Fuzzing of 50 HTTP request headers by default
+- Fuzzing of 50 [HTTP request headers](internal/resource/header.txt) by default
 - Fuzzing of HTTP POST data parameters
 - Fuzzing of JSON data parameters
-- HTTP Form fuzzing
-- Auth fuzzing (Basic & Bearer)
-- WAF Bypass payloads
+- HTTP Form detection & fuzzing
+- Auth detection & fuzzing (Basic & Bearer)
+- [WAF Bypass payloads](internal/resource/bypass.txt)
 
 ## Background
 CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2. An unauthenticated, remote attacker could exploit this flaw by sending a specially crafted request to a server running a vulnerable version of log4j. The crafted request uses a Java Naming and Directory Interface (JNDI) injection via a variety of services including:
@@ -144,6 +144,7 @@ Usage:
 Examples:
 - Scan a complete cidr: scan4log4shell remote cidr 172.20.0.0/24
 - TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444
+- Custom headers file: scan4log4shell remote cidr 172.20.0.0/24 --headers-file ./headers.txt
 
 Flags:
       --auth-fuzzing            add auth fuzzing
@@ -186,6 +187,7 @@ Examples:
 - Scan a url: scan4log4shell remote url https://target.org
 - Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
+- Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
 
 Flags:
       --auth-fuzzing            add auth fuzzing

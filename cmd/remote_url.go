@@ -28,7 +28,8 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 		Args:  cobra.MinimumNArgs(1),
 		Example: `- Scan a url: scan4log4shell remote url https://target.org
 - Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
-- TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444`,
+- TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
+- Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
