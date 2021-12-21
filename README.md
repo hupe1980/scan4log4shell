@@ -1,4 +1,4 @@
-<h1 align="center">scan4log4shell</h1>
+# scan4log4shell
 > Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
 
 ## Features
