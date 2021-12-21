@@ -34,8 +34,8 @@ func newCatchCmd() *cobra.Command {
 
 			defer catcher.Close()
 
-			catcher.Handler(func(remoteAddr string) {
-				printDanger("Possibly vulnerable host identified: %v", remoteAddr)
+			catcher.Handler(func(remoteAddr, resource string) {
+				printDanger("Possibly vulnerable host identified: %v/%s", remoteAddr, resource)
 			})
 
 			printInfo("Listening on %s", catcher.Addr())
@@ -57,6 +57,13 @@ func newCatcher(catcherType, caddr string) (internal.CallbackCatcher, error) {
 	switch catcherType {
 	case "tcp":
 		catcher, err := internal.NewTCPCallBackCatcher("tcp", caddr)
+		if err != nil {
+			return nil, err
+		}
+
+		return catcher, nil
+	case "ldap":
+		catcher, err := internal.NewLDAPCatcher(caddr)
 		if err != nil {
 			return nil, err
 		}

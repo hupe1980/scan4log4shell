@@ -325,7 +325,7 @@ func createPayloads(opts *RemoteOptions) ([]string, error) {
 			return nil, err
 		}
 
-		p, err := executeTemplate(t, "l4s", opts.CADDR)
+		p, err := executeTemplate(t, resource, opts.CADDR)
 		if err != nil {
 			return nil, err
 		}

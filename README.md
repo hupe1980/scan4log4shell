@@ -4,7 +4,7 @@
 ## Features
 - [Local](#local) and [remote](#remote) scanner
 - Supports URL and CIDR scans
-- Supports DNS & TCP callbacks for vulnerability discovery and validation
+- Supports DNS, LDAP & TCP callbacks for vulnerability discovery and validation
 - Fuzzing of 50 [HTTP request headers](internal/resource/header.txt) by default
 - Fuzzing of HTTP POST data parameters
 - Fuzzing of JSON data parameters
@@ -149,7 +149,7 @@ Examples:
 Flags:
       --auth-fuzzing            add auth fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
-      --catcher-type string     type of callback catcher (dns | tcp | none) (default "dns")
+      --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046
       --field stringArray       field to use
       --fields-file string      use custom field from file
@@ -193,7 +193,7 @@ Examples:
 Flags:
       --auth-fuzzing            add auth fuzzing
       --caddr string            address to catch the callbacks (eg. ip:port)
-      --catcher-type string     type of callback catcher (dns | tcp | none) (default "dns")
+      --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046
       --field stringArray       field to use
       --fields-file string      use custom field from file

@@ -92,8 +92,8 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 
 				remoteOpts.CADDR = catcher.Addr()
 
-				catcher.Handler(func(remoteAddr string) {
-					printDanger("Possibly vulnerable host identified: %v", remoteAddr)
+				catcher.Handler(func(remoteAddr, resource string) {
+					printDanger("Possibly vulnerable host identified: %v/%s", remoteAddr, resource)
 				})
 
 				printInfo("Listening on %s", catcher.Addr())

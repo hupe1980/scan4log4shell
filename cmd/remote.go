@@ -66,7 +66,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringVarP(&opts.requestType, "type", "t", "get", "get, post or json")
 	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")
 	cmd.Flags().StringVarP(&opts.resource, "resource", "r", "l4s", "resource in payload")
-	cmd.Flags().StringVarP(&opts.catcherType, "catcher-type", "", "dns", "type of callback catcher (dns | tcp | none)")
+	cmd.Flags().StringVarP(&opts.catcherType, "catcher-type", "", "dns", "type of callback catcher (dns | ldap | tcp | none)")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
 	cmd.Flags().BoolVarP(&opts.authFuzzing, "auth-fuzzing", "", false, "add auth fuzzing")
 	cmd.Flags().BoolVarP(&opts.submitForms, "submit-forms", "", false, "add form submits to fuzzing")

@@ -3,14 +3,17 @@ package internal
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net"
 	"time"
 
 	ishc "github.com/projectdiscovery/interactsh/pkg/client"
 	ishs "github.com/projectdiscovery/interactsh/pkg/server"
+	ldap "github.com/vjeantet/ldapserver"
 )
 
-type CallbackHandlerFunc func(remoteAddr string)
+type CallbackHandlerFunc func(remoteAddr, resource string)
 
 type CallbackCatcher interface {
 	Listen(ctx context.Context) error
@@ -79,7 +82,7 @@ func (cc *tcpCallbackCatcher) handleRequest(conn net.Conn) {
 
 	if addr, ok := conn.RemoteAddr().(*net.TCPAddr); ok {
 		for _, handler := range cc.handlers {
-			handler(fmt.Sprintf("%s:%d", addr.IP.String(), addr.Port))
+			handler(fmt.Sprintf("%s:%d", addr.IP.String(), addr.Port), "")
 		}
 	}
 
@@ -114,7 +117,7 @@ func (cc *interactsh) Addr() string {
 func (cc *interactsh) Listen(ctx context.Context) error {
 	cc.client.StartPolling(1*time.Second, func(i *ishs.Interaction) {
 		for _, handler := range cc.handlers {
-			handler(i.RemoteAddress)
+			handler(i.RemoteAddress, "")
 		}
 	})
 
@@ -128,4 +131,67 @@ func (cc *interactsh) Close() error {
 
 func (cc *interactsh) Handler(fn CallbackHandlerFunc) {
 	cc.handlers = append(cc.handlers, fn)
+}
+
+type ldapCatcher struct {
+	server   *ldap.Server
+	addr     string
+	handlers []CallbackHandlerFunc
+}
+
+func NewLDAPCatcher(addr string) (CallbackCatcher, error) {
+	if _, _, err := net.SplitHostPort(addr); err != nil {
+		addr = fmt.Sprintf("%s:%s", addr, "389")
+	}
+
+	ldap.Logger = log.New(ioutil.Discard, "", 0)
+
+	server := ldap.NewServer()
+
+	ldapCatchter := &ldapCatcher{
+		server:   server,
+		addr:     addr,
+		handlers: []CallbackHandlerFunc{},
+	}
+
+	routes := ldap.NewRouteMux()
+	routes.Bind(ldapCatchter.handleBind)
+	routes.Search(ldapCatchter.handleSearch)
+
+	ldapCatchter.server.Handle(routes)
+
+	return ldapCatchter, nil
+}
+
+func (lc *ldapCatcher) Listen(ctx context.Context) error {
+	return lc.server.ListenAndServe(lc.addr)
+}
+
+func (lc *ldapCatcher) Addr() string {
+	return lc.addr
+}
+
+func (lc *ldapCatcher) Close() error {
+	lc.server.Stop()
+	return nil
+}
+
+func (lc *ldapCatcher) Handler(fn CallbackHandlerFunc) {
+	lc.handlers = append(lc.handlers, fn)
+}
+
+func (lc *ldapCatcher) handleBind(w ldap.ResponseWriter, m *ldap.Message) {
+	res := ldap.NewBindResponse(ldap.LDAPResultSuccess)
+	w.Write(res)
+}
+
+func (lc *ldapCatcher) handleSearch(w ldap.ResponseWriter, m *ldap.Message) {
+	req := m.GetSearchRequest()
+
+	for _, handler := range lc.handlers {
+		handler(m.Client.Addr().String(), string(req.BaseObject()))
+	}
+
+	res := ldap.NewSearchResultDoneResponse(ldap.LDAPResultSuccess)
+	w.Write(res)
 }
