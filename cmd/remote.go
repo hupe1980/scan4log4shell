@@ -79,7 +79,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().BoolVarP(&opts.checkCVE2021_45046, "check-cve-2021-45046", "", false, "check for CVE-2021-45046")
 	cmd.Flags().StringArrayVarP(&opts.headers, "header", "", []string{""}, "header to use")
 	cmd.Flags().StringArrayVarP(&opts.fields, "field", "", []string{""}, "field to use")
-	cmd.Flags().StringArrayVarP(&opts.payloads, "payload", "", []string{""}, "payload to use")
+	cmd.Flags().StringArrayVarP(&opts.payloads, "payload", "", nil, "payload to use")
 }
 
 var unauthorizedHandler = func(verbose bool) internal.StatusCodeHandlerFunc {
