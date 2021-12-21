@@ -13,7 +13,7 @@
 - [WAF Bypass payloads](internal/resource/bypass.txt)
 
 ## Background
-CVE-2021-44228 is a remote code execution (RCE) vulnerability in Apache Log4j 2. An unauthenticated, remote attacker could exploit this flaw by sending a specially crafted request to a server running a vulnerable version of log4j. The crafted request uses a Java Naming and Directory Interface (JNDI) injection via a variety of services including:
+[CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) is a remote code execution (RCE) vulnerability in Apache Log4j 2. An unauthenticated, remote attacker could exploit this flaw by sending a specially crafted request to a server running a vulnerable version of log4j. The crafted request uses a Java Naming and Directory Interface (JNDI) injection via a variety of services including:
 - Lightweight Directory Access Protocol (LDAP)
 - Secure LDAP (LDAPS)
 - Remote Method Invocation (RMI)
@@ -247,7 +247,7 @@ scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.intera
 scanner_1  | [!] Possibly vulnerable host identified: 172.20.0.13
 ```
 
-### Custom Payload
+### Custom Payloads
 If you specify a file with custom payloads, you can use the following placeholders for callback address and resource:
 - {{ .CADDR }}
 - {{ .Resource }}
