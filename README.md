@@ -49,7 +49,7 @@ Usage:
   scan4log4shell [command]
 
 Available Commands:
-  catch       Start a callback catcher
+  catch       Start a standalone callback catcher
   completion  Prints shell autocompletion scripts for scan4log4shell
   help        Help about any command
   local       Detect vulnerable log4j versions on your file-system

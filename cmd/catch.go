@@ -16,7 +16,7 @@ func newCatchCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:                   "catch [tcp | dns]",
-		Short:                 "Start a callback catcher",
+		Short:                 "Start a standalone callback catcher",
 		Args:                  cobra.MinimumNArgs(1),
 		SilenceUsage:          true,
 		DisableFlagsInUseLine: true,
