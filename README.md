@@ -65,6 +65,27 @@ Flags:
 Use "scan4log4shell [command] --help" for more information about a command.
 ```
 
+## Catch
+Start a standalone callback catcher
+```console
+Usage:
+  scan4log4shell catch [tcp | dns | ldap] [flags]
+
+Examples:
+- Start a standalone dns catcher: scan4log4shell catch dns
+- Start a standalone ldap catcher: scan4log4shell catch ldap --caddr 127.0.0.1:4444
+- Start a standalone tcp catcher: scan4log4shell catch tcp --caddr 127.0.0.1:4444
+
+Flags:
+      --caddr string   address to catch the callbacks (eg. ip:port)
+  -h, --help           help for catch
+
+Global Flags:
+      --no-color        disable color output
+  -o, --output string   output logfile name
+  -v, --verbose         print detailed logging messages
+```
+
 ## Local
 Detect vulnerable log4j versions on your file-system
 ```console
