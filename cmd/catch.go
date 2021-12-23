@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/signal"
 	"strings"
 
 	"github.com/hupe1980/log4shellscan/internal"
@@ -15,11 +17,14 @@ func newCatchCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:                   "catch [tcp | dns]",
-		Short:                 "Start a standalone callback catcher",
-		Args:                  cobra.MinimumNArgs(1),
-		SilenceUsage:          true,
-		DisableFlagsInUseLine: true,
+		Use:   "catch [tcp | dns | ldap]",
+		Short: "Start a standalone callback catcher",
+		Args:  cobra.MinimumNArgs(1),
+		Example: `- Start a standalone dns catcher: scan4log4shell catch dns
+- Start a standalone ldap catcher: scan4log4shell catch ldap --caddr 127.0.0.1:4444
+- Start a standalone tcp catcher: scan4log4shell catch tcp --caddr 127.0.0.1:4444`,
+		SilenceUsage:  true,
+		SilenceErrors: true,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := context.WithCancel(context.Background())
@@ -40,9 +45,17 @@ func newCatchCmd() *cobra.Command {
 
 			printInfo("Listening on %s", catcher.Addr())
 
-			if err := catcher.Listen(ctx); err != nil {
-				return err
-			}
+			go func() {
+				if err := catcher.Listen(ctx); err != nil {
+					printError("cannot start %s callback catcher: %s", catcherType, err)
+					os.Exit(1)
+				}
+			}()
+
+			signalChan := make(chan os.Signal, 1)
+			signal.Notify(signalChan, os.Interrupt)
+
+			<-signalChan
 
 			return nil
 		},
