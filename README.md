@@ -92,6 +92,10 @@ Detect vulnerable log4j versions on your file-system
 Usage:
   scan4log4shell local [paths] [flags]
 
+Examples:
+- Scan /var/www: scan4log4shell local /var/www
+- Ignore zip & aar: scan4log4shell local . --ignore-ext .zip --ignore-ext .aar
+
 Flags:
   -e, --exclude stringArray      path to exclude
   -h, --help                     help for local
@@ -169,6 +173,7 @@ Examples:
 
 Flags:
       --auth-fuzzing            add auth fuzzing
+      --basic-auth string       basic auth credentials (eg. user:pass)
       --caddr string            address to catch the callbacks (eg. ip:port)
       --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046
@@ -210,9 +215,11 @@ Examples:
 - Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
+- Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass
 
 Flags:
       --auth-fuzzing            add auth fuzzing
+      --basic-auth string       basic auth credentials (eg. user:pass)
       --caddr string            address to catch the callbacks (eg. ip:port)
       --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046

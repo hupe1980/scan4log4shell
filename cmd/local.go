@@ -29,6 +29,8 @@ func newLocalCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
 		Short:         "Detect vulnerable log4j versions on your file-system",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		Example: `- Scan /var/www: scan4log4shell local /var/www
+- Ignore zip & aar: scan4log4shell local . --ignore-ext .zip --ignore-ext .aar`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if *output != "" {
 				color.NoColor = true
