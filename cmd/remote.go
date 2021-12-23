@@ -19,6 +19,7 @@ const (
 )
 
 type remoteOptions struct {
+	basicAuth          string
 	caddr              string
 	requestType        string
 	proxy              string
@@ -62,6 +63,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringVarP(&opts.headersFile, "headers-file", "", "", "use custom headers from file")
 	cmd.Flags().StringVarP(&opts.fieldsFile, "fields-file", "", "", "use custom field from file")
 	cmd.Flags().StringVarP(&opts.payloadsFile, "payloads-file", "", "", "use custom payloads from file")
+	cmd.Flags().StringVarP(&opts.basicAuth, "basic-auth", "", "", "basic auth credentials (eg. user:pass)")
 	cmd.Flags().StringVarP(&opts.caddr, "caddr", "", "", "address to catch the callbacks (eg. ip:port)")
 	cmd.Flags().StringVarP(&opts.requestType, "type", "t", "get", "get, post or json")
 	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")

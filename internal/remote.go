@@ -26,6 +26,7 @@ const (
 type StatusCodeHandlerFunc func(ctx context.Context, client *http.Client, resp *http.Response, req *http.Request, payload string, opts *RemoteOptions)
 
 type RemoteOptions struct {
+	BasicAuth          string
 	CADDR              string
 	RequestType        string
 	Proxies            []*url.URL
@@ -178,6 +179,11 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 
 	req.Header = header
 
+	if rs.opts.BasicAuth != "" {
+		creds := strings.SplitN(rs.opts.BasicAuth, ":", 2)
+		req.SetBasicAuth(creds[0], creds[1])
+	}
+
 	// Add payload as query string
 	values := req.URL.Query()
 	values.Add("q", payload)
@@ -231,6 +237,11 @@ func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {
 
 		if h == "Cookie" {
 			header.Set("Cookie", fmt.Sprintf("SessCookie=%s", payload))
+			continue
+		}
+
+		if h == "Authorization" && rs.opts.BasicAuth != "" {
+			// ignore
 			continue
 		}
 

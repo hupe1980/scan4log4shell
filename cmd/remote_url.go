@@ -30,7 +30,8 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 		Example: `- Scan a url: scan4log4shell remote url https://target.org
 - Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
-- Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt`,
+- Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
+- Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -59,6 +60,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 			sem := semaphore.NewWeighted(int64(opts.maxThreads))
 
 			remoteOpts := &internal.RemoteOptions{
+				BasicAuth:          opts.basicAuth,
 				CADDR:              opts.caddr,
 				Resource:           opts.resource,
 				RequestType:        strings.ToLower(opts.requestType),

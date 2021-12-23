@@ -62,6 +62,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 			sem := semaphore.NewWeighted(int64(opts.maxThreads))
 
 			remoteOpts := &internal.RemoteOptions{
+				BasicAuth:          opts.basicAuth,
 				CADDR:              opts.caddr,
 				Resource:           opts.resource,
 				RequestType:        strings.ToLower(opts.requestType),
