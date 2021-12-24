@@ -43,6 +43,17 @@ Download the .deb, .rpm or .apk from the [releases page](https://github.com/hupe
 ### manually:
 Download the pre-compiled binaries from the [releases page](https://github.com/hupe1980/scan4log4shell/releases) and copy to the desired location.
 
+## Building from source
+Install a [Go compiler](https://golang.org/dl).
+
+Run the following commands in the checked-out repository:
+
+```
+make build
+```
+
+(Add the appropriate .exe extension on Windows systems, of course.)
+
 ## Usage 
 ```console
 Usage:

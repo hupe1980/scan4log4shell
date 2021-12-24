@@ -14,6 +14,11 @@ setup:
 test: 
 	@go test -v -race -count=1  ./...
 
+.PHONY: build
+## build: Build from source
+build:
+	@go build -o scan4log4shell .
+
 .PHONY: run
 run:
 	@go run *.go remote url -h
