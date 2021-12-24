@@ -46,7 +46,7 @@ Download the pre-compiled binaries from the [releases page](https://github.com/h
 ## Building from source
 Install a [Go compiler](https://golang.org/dl).
 
-Run the following commands in the checked-out repository:
+Run the following command in the checked-out repository:
 
 ```
 make build
