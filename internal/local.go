@@ -3,6 +3,7 @@ package internal
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -153,7 +154,7 @@ func (ls *localScanState) HasCVE2021_45105() bool {
 }
 
 func (ls *LocalScanner) InspectJar(path string, ra io.ReaderAt, sz int64, opts *LocalOptions) {
-	zr, err := zip.NewReader(ra, sz)
+	zr, err := newZipReader(ra, sz)
 	if err != nil {
 		ls.errsChan <- fmt.Errorf("cannot open JAR file: %s (size %d): %v", path, sz, err)
 		return
@@ -264,6 +265,45 @@ func (ls *LocalScanner) InspectJar(path string, ra io.ReaderAt, sz int64, opts *
 	} else if state.IsPatched() {
 		ls.infosChan <- fmt.Sprintf("possibly CVE-2021-44228 patched (no JndiLookup.class) file identified: %s", absFilepath(path))
 	}
+}
+
+// https://github.com/golang/go/issues/10464#issuecomment-97974790
+func newZipReader(r io.ReaderAt, size int64) (*zip.Reader, error) {
+	const BUFSIZE = 4096
+
+	var buf [BUFSIZE + 4]byte
+
+	for i := int64(0); i*BUFSIZE < size; i++ {
+		l, err := r.ReadAt(buf[:], i*BUFSIZE)
+		if err != nil && err != io.EOF {
+			break
+		}
+
+		s := 0
+
+		for {
+			bi := bytes.Index(buf[s:l], []byte("PK\x03\x04")) // 0x04034b50
+			if bi == -1 {
+				break
+			}
+
+			off := i*BUFSIZE + int64(s+bi)
+			ssize := size - off
+			sr := io.NewSectionReader(r, off, ssize)
+
+			if zr, ze := zip.NewReader(sr, ssize+1); ze == nil {
+				return zr, nil
+			}
+
+			s += bi + 1
+		}
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	return nil, errors.New("no zip file found")
 }
 
 func readArchiveMember(file *zip.File) ([]byte, error) {
