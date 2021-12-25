@@ -36,6 +36,7 @@ type RemoteOptions struct {
 	WafBypass          bool
 	HeadersFile        string
 	Headers            []string
+	HeaderValues       map[string]string
 	FieldsFile         string
 	Fields             []string
 	PayLoadsFile       string
@@ -264,6 +265,10 @@ func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {
 		}
 
 		header.Add(h, payload)
+	}
+
+	for k, v := range rs.opts.HeaderValues {
+		header.Set(k, v)
 	}
 
 	return header, nil

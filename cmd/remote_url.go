@@ -70,6 +70,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				WafBypass:          opts.wafBypass,
 				HeadersFile:        opts.headersFile,
 				Headers:            opts.headers,
+				HeaderValues:       opts.headerValues,
 				FieldsFile:         opts.fieldsFile,
 				Fields:             opts.fields,
 				PayLoadsFile:       opts.payloadsFile,

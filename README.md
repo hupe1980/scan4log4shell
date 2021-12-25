@@ -185,31 +185,34 @@ Examples:
 - Run all tests: scan4log4shell rremote cidr 172.20.0.0/24 -t get,post,json --waf-bypass
 
 Flags:
-      --auth-fuzzing            add auth fuzzing
-      --basic-auth string       basic auth credentials (eg. user:pass)
-      --caddr string            address to catch the callbacks (eg. ip:port)
-      --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
-      --check-cve-2021-45046    check for CVE-2021-45046
-      --field strings           field to use
-      --fields-file string      use custom field from file
-      --header strings          header to use
-      --headers-file string     use custom headers from file
-  -h, --help                    help for cidr
-      --max-threads int         max number of concurrent threads (default 150)
-      --no-redirect             do not follow redirects
-      --no-user-agent-fuzzing   exclude user-agent header from fuzzing
-      --no-wait-timeout         wait forever for callbacks
-      --payload strings         payload to use
-      --payloads-file string    use custom payloads from file
-  -p, --port strings            port to scan (default [8080])
-      --proxy string            proxy url
-  -r, --resource string         resource in payload (default "l4s")
-      --schema string           schema to use for requests (default "https")
-      --submit-forms            add form submits to fuzzing
-      --timeout duration        time limit for requests (default 3s)
-  -t, --type strings            get, post or json (default [get])
-      --waf-bypass              extend scans with WAF bypass payload
-  -w, --wait duration           wait time to catch callbacks (default 5s)
+      --auth-fuzzing                add auth fuzzing
+      --basic-auth string           basic auth credentials (eg. user:pass)
+      --caddr string                address to catch the callbacks (eg. ip:port)
+      --catcher-type string         type of callback catcher (dns | ldap | tcp | none) (default "dns")
+      --check-cve-2021-45046        check for CVE-2021-45046
+      --field strings               field to use
+      --fields-file string          use custom field from file
+      --header strings              header to use
+      --headers-file string         use custom headers from file
+  -h, --help                        help for cidr
+      --max-threads int             max number of concurrent threads (default 150)
+      --no-redirect                 do not follow redirects
+      --no-user-agent-fuzzing       exclude user-agent header from fuzzing
+      --no-wait-timeout             wait forever for callbacks
+      --param strings               query param to use
+      --params-file string          use custom query params from file
+      --payload strings             payload to use
+      --payloads-file string        use custom payloads from file
+  -p, --port strings                port to scan (default [8080])
+      --proxy string                proxy url
+  -r, --resource string             resource in payload (default "l4s")
+      --schema string               schema to use for requests (default "https")
+      --set-header stringToString   set fix header value (default [])
+      --submit-forms                add form submits to fuzzing
+      --timeout duration            time limit for requests (default 3s)
+  -t, --type strings                get, post or json (default [get])
+      --waf-bypass                  extend scans with WAF bypass payload
+  -w, --wait duration               wait time to catch callbacks (default 5s)
 
 Global Flags:
       --no-color        disable color output
@@ -232,29 +235,32 @@ Examples:
 - Run all tests: scan4log4shell remote url https://target.org -t get,post,json --waf-bypass
 
 Flags:
-      --auth-fuzzing            add auth fuzzing
-      --basic-auth string       basic auth credentials (eg. user:pass)
-      --caddr string            address to catch the callbacks (eg. ip:port)
-      --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
-      --check-cve-2021-45046    check for CVE-2021-45046
-      --field strings           field to use
-      --fields-file string      use custom field from file
-      --header strings          header to use
-      --headers-file string     use custom headers from file
-  -h, --help                    help for url
-      --max-threads int         max number of concurrent threads (default 150)
-      --no-redirect             do not follow redirects
-      --no-user-agent-fuzzing   exclude user-agent header from fuzzing
-      --no-wait-timeout         wait forever for callbacks
-      --payload strings         payload to use
-      --payloads-file string    use custom payloads from file
-      --proxy string            proxy url
-  -r, --resource string         resource in payload (default "l4s")
-      --submit-forms            add form submits to fuzzing
-      --timeout duration        time limit for requests (default 3s)
-  -t, --type strings            get, post or json (default [get])
-      --waf-bypass              extend scans with WAF bypass payload
-  -w, --wait duration           wait time to catch callbacks (default 5s)
+      --auth-fuzzing                add auth fuzzing
+      --basic-auth string           basic auth credentials (eg. user:pass)
+      --caddr string                address to catch the callbacks (eg. ip:port)
+      --catcher-type string         type of callback catcher (dns | ldap | tcp | none) (default "dns")
+      --check-cve-2021-45046        check for CVE-2021-45046
+      --field strings               field to use
+      --fields-file string          use custom field from file
+      --header strings              header to use
+      --headers-file string         use custom headers from file
+  -h, --help                        help for url
+      --max-threads int             max number of concurrent threads (default 150)
+      --no-redirect                 do not follow redirects
+      --no-user-agent-fuzzing       exclude user-agent header from fuzzing
+      --no-wait-timeout             wait forever for callbacks
+      --param strings               query param to use
+      --params-file string          use custom query params from file
+      --payload strings             payload to use
+      --payloads-file string        use custom payloads from file
+      --proxy string                proxy url
+  -r, --resource string             resource in payload (default "l4s")
+      --set-header stringToString   set fix header value (default [])
+      --submit-forms                add form submits to fuzzing
+      --timeout duration            time limit for requests (default 3s)
+  -t, --type strings                get, post or json (default [get])
+      --waf-bypass                  extend scans with WAF bypass payload
+  -w, --wait duration               wait time to catch callbacks (default 5s)
 
 Global Flags:
       --no-color        disable color output
