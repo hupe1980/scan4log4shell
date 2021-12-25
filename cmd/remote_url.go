@@ -73,8 +73,12 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				HeaderValues:       opts.headerValues,
 				FieldsFile:         opts.fieldsFile,
 				Fields:             opts.fields,
+				FieldValues:        opts.fieldValues,
 				PayLoadsFile:       opts.payloadsFile,
 				Payloads:           opts.payloads,
+				ParamsFile:         opts.paramsFile,
+				Params:             opts.params,
+				ParamValues:        opts.paramValues,
 				Timeout:            opts.timeout,
 				CheckCVE2021_45046: opts.checkCVE2021_45046,
 			}

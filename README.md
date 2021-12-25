@@ -207,7 +207,9 @@ Flags:
       --proxy string                proxy url
   -r, --resource string             resource in payload (default "l4s")
       --schema string               schema to use for requests (default "https")
-      --set-header stringToString   set fix header value (default [])
+      --set-field stringToString    set fix field value (key=value) (default [])
+      --set-header stringToString   set fix header value (key=value) (default [])
+      --set-param stringToString    set fix query param value (key=value) (default [])
       --submit-forms                add form submits to fuzzing
       --timeout duration            time limit for requests (default 3s)
   -t, --type strings                get, post or json (default [get])
@@ -255,7 +257,9 @@ Flags:
       --payloads-file string        use custom payloads from file
       --proxy string                proxy url
   -r, --resource string             resource in payload (default "l4s")
-      --set-header stringToString   set fix header value (default [])
+      --set-field stringToString    set fix field value (key=value) (default [])
+      --set-header stringToString   set fix header value (key=value) (default [])
+      --set-param stringToString    set fix query param value (key=value) (default [])
       --submit-forms                add form submits to fuzzing
       --timeout duration            time limit for requests (default 3s)
   -t, --type strings                get, post or json (default [get])

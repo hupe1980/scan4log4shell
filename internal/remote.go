@@ -39,10 +39,12 @@ type RemoteOptions struct {
 	HeaderValues       map[string]string
 	FieldsFile         string
 	Fields             []string
+	FieldValues        map[string]string
 	PayLoadsFile       string
 	Payloads           []string
 	ParamsFile         string
 	Params             []string
+	ParamValues        map[string]string
 	Timeout            time.Duration
 	CheckCVE2021_45046 bool
 }
@@ -170,6 +172,10 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 			data.Set(field, payload)
 		}
 
+		for k, v := range rs.opts.FieldValues {
+			data.Set(k, v)
+		}
+
 		req, err = http.NewRequestWithContext(ctx, "POST", u, strings.NewReader(data.Encode()))
 		if err != nil {
 			return nil, err
@@ -180,6 +186,10 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 		values := make(map[string]string)
 		for _, field := range rs.fields {
 			values[field] = payload
+		}
+
+		for k, v := range rs.opts.FieldValues {
+			values[k] = v
 		}
 
 		jsonValue, err := json.Marshal(values)
@@ -204,6 +214,10 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 	values := req.URL.Query()
 	for _, q := range rs.params {
 		values.Add(q, payload)
+	}
+
+	for k, v := range rs.opts.ParamValues {
+		values.Set(k, v)
 	}
 
 	req.URL.RawQuery = values.Encode()

@@ -38,8 +38,10 @@ type remoteOptions struct {
 	headerValues       map[string]string
 	fieldsFile         string
 	fields             []string
+	fieldValues        map[string]string
 	paramsFile         string
 	params             []string
+	paramValues        map[string]string
 	payloadsFile       string
 	payloads           []string
 	maxThreads         int
@@ -87,7 +89,9 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringSliceVarP(&opts.fields, "field", "", nil, "field to use")
 	cmd.Flags().StringSliceVarP(&opts.params, "param", "", nil, "query param to use")
 	cmd.Flags().StringSliceVarP(&opts.payloads, "payload", "", nil, "payload to use")
-	cmd.Flags().StringToStringVarP(&opts.headerValues, "set-header", "", nil, "set fix header value")
+	cmd.Flags().StringToStringVarP(&opts.headerValues, "set-header", "", nil, "set fix header value (key=value)")
+	cmd.Flags().StringToStringVarP(&opts.fieldValues, "set-field", "", nil, "set fix field value (key=value)")
+	cmd.Flags().StringToStringVarP(&opts.paramValues, "set-param", "", nil, "set fix query param value (key=value)")
 }
 
 var unauthorizedHandler = func(verbose bool) internal.StatusCodeHandlerFunc {
