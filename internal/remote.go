@@ -12,15 +12,12 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strings"
 	"time"
 )
 
 const (
-	defaultUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
-	windowsUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
-	darwinUserAgent  = "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"
+	defaultUserAgent = "scan4log4shell (https://github.com/hupe1980/scan4log4shell)"
 )
 
 type StatusCodeHandlerFunc func(ctx context.Context, client *http.Client, resp *http.Response, req *http.Request, payload string, opts *RemoteOptions)
@@ -239,20 +236,9 @@ func (rs *RemoteScanner) newHTTPHeader(payload string) (http.Header, error) {
 		keys = rs.opts.Headers
 	}
 
-	var userAgent string
-
-	switch runtime.GOOS {
-	case "windows":
-		userAgent = windowsUserAgent
-	case "darwin":
-		userAgent = darwinUserAgent
-	default:
-		userAgent = defaultUserAgent
-	}
-
 	header := make(http.Header)
 
-	header.Set("User-Agent", userAgent)
+	header.Set("User-Agent", defaultUserAgent)
 	header.Set("Accept", "*/*")
 
 	for _, h := range keys {
