@@ -44,7 +44,8 @@ Download the .deb, .rpm or .apk from the [releases page](https://github.com/hupe
 Download the pre-compiled binaries from the [releases page](https://github.com/hupe1980/scan4log4shell/releases) and copy to the desired location.
 
 ## Building from source
-Install a [Go compiler](https://golang.org/dl).
+Install a [Go 1.17 compiler](https://golang.org/dl).
+Most system Go compiler come with OS are older than 1.17.
 
 Run the following command in the checked-out repository:
 
