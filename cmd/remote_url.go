@@ -31,7 +31,8 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 - Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
-- Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass`,
+- Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass
+- Run all tests: scan4log4shell remote url https://target.org -t get,post,json --waf-bypass`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -63,7 +64,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				BasicAuth:          opts.basicAuth,
 				CADDR:              opts.caddr,
 				Resource:           opts.resource,
-				RequestType:        strings.ToLower(opts.requestType),
+				RequestTypes:       opts.requestTypes,
 				NoUserAgentFuzzing: opts.noUserAgentFuzzing,
 				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
@@ -127,26 +128,28 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				printInfo("Start scanning CIDR %s\n---------", targetURL)
 
 				for _, payload := range scanner.Payloads() {
-					if err := sem.Acquire(ctx, 1); err != nil {
-						return err
-					}
-
-					if *verbose {
-						printInfo("Checking %s for %s", payload, targetURL)
-					}
-
-					wg.Add(1)
-
-					go func(targetURL, payload string) {
-						defer func() {
-							wg.Done()
-							sem.Release(1)
-						}()
-
-						if err := scanner.Scan(ctx, opts.requestType, targetURL, payload); err != nil {
-							errs <- err
+					for _, method := range opts.requestTypes {
+						if err := sem.Acquire(ctx, 1); err != nil {
+							return err
 						}
-					}(targetURL, payload)
+
+						if *verbose {
+							printInfo("Checking %s for %s [%s]", payload, targetURL, strings.ToUpper(method))
+						}
+
+						wg.Add(1)
+
+						go func(method, targetURL, payload string) {
+							defer func() {
+								wg.Done()
+								sem.Release(1)
+							}()
+
+							if err := scanner.Scan(ctx, strings.ToLower(method), targetURL, payload); err != nil {
+								errs <- err
+							}
+						}(method, targetURL, payload)
+					}
 				}
 
 				printInfo("All request to %s have been sent", targetURL)

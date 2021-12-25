@@ -31,7 +31,8 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 		Args:  cobra.MinimumNArgs(1),
 		Example: `- Scan a complete cidr: scan4log4shell remote cidr 172.20.0.0/24
 - TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444
-- Custom headers file: scan4log4shell remote cidr 172.20.0.0/24 --headers-file ./headers.txt`,
+- Custom headers file: scan4log4shell remote cidr 172.20.0.0/24 --headers-file ./headers.txt
+- Run all tests: scan4log4shell rremote cidr 172.20.0.0/24 -t get,post,json --waf-bypass`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -65,7 +66,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 				BasicAuth:          opts.basicAuth,
 				CADDR:              opts.caddr,
 				Resource:           opts.resource,
-				RequestType:        strings.ToLower(opts.requestType),
+				RequestTypes:       opts.requestTypes,
 				NoUserAgentFuzzing: opts.noUserAgentFuzzing,
 				NoRedirect:         opts.noRedirect,
 				WafBypass:          opts.wafBypass,
@@ -128,13 +129,13 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 
 			errs := make(chan error)
 
-			if err := scanner.CIDRWalk(cidr, opts.schema, opts.ports, func(url, payload string) error {
+			if err := scanner.CIDRWalk(cidr, opts.schema, opts.ports, func(method, url, payload string) error {
 				if err := sem.Acquire(ctx, 1); err != nil {
 					return err
 				}
 
 				if *verbose {
-					printInfo("Checking %s for %s", payload, url)
+					printInfo("Checking %s for %s [%s]", payload, url, strings.ToUpper(method))
 				}
 
 				wg.Add(1)
@@ -145,7 +146,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 						sem.Release(1)
 					}()
 
-					if err := scanner.Scan(ctx, opts.requestType, url, payload); err != nil {
+					if err := scanner.Scan(ctx, method, url, payload); err != nil {
 						errs <- err
 					}
 				}()
@@ -190,7 +191,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 
 	addRemoteFlags(cmd, &opts.remoteOptions)
 	cmd.Flags().StringVarP(&opts.schema, "schema", "", "https", "schema to use for requests")
-	cmd.Flags().StringArrayVarP(&opts.ports, "port", "p", []string{"8080"}, "port to scan")
+	cmd.Flags().StringSliceVarP(&opts.ports, "port", "p", []string{"8080"}, "port to scan")
 
 	return cmd
 }

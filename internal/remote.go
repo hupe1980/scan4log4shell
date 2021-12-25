@@ -28,7 +28,7 @@ type StatusCodeHandlerFunc func(ctx context.Context, client *http.Client, resp *
 type RemoteOptions struct {
 	BasicAuth          string
 	CADDR              string
-	RequestType        string
+	RequestTypes       []string
 	Proxies            []*url.URL
 	Resource           string
 	NoUserAgentFuzzing bool
@@ -75,7 +75,7 @@ func NewRemoteScanner(opts *RemoteOptions) (*RemoteScanner, error) {
 	}, nil
 }
 
-func (rs *RemoteScanner) CIDRWalk(cidr, schema string, ports []string, fn func(url, payload string) error) error {
+func (rs *RemoteScanner) CIDRWalk(cidr, schema string, ports []string, fn func(method, url, payload string) error) error {
 	_, ipv4Net, err := net.ParseCIDR(cidr)
 	if err != nil {
 		return err
@@ -94,8 +94,10 @@ func (rs *RemoteScanner) CIDRWalk(cidr, schema string, ports []string, fn func(u
 			url := fmt.Sprintf("%s://%s:%s", schema, ip, p)
 
 			for _, p := range rs.payloads {
-				if err := fn(url, p); err != nil {
-					return err
+				for _, t := range rs.opts.RequestTypes {
+					if err := fn(strings.ToLower(t), url, p); err != nil {
+						return err
+					}
 				}
 			}
 		}

@@ -21,7 +21,7 @@ const (
 type remoteOptions struct {
 	basicAuth          string
 	caddr              string
-	requestType        string
+	requestTypes       []string
 	proxy              string
 	catcherType        string
 	resource           string
@@ -65,7 +65,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringVarP(&opts.payloadsFile, "payloads-file", "", "", "use custom payloads from file")
 	cmd.Flags().StringVarP(&opts.basicAuth, "basic-auth", "", "", "basic auth credentials (eg. user:pass)")
 	cmd.Flags().StringVarP(&opts.caddr, "caddr", "", "", "address to catch the callbacks (eg. ip:port)")
-	cmd.Flags().StringVarP(&opts.requestType, "type", "t", "get", "get, post or json")
+	cmd.Flags().StringSliceVarP(&opts.requestTypes, "type", "t", []string{"get"}, "get, post or json")
 	cmd.Flags().StringVarP(&opts.proxy, "proxy", "", "", "proxy url")
 	cmd.Flags().StringVarP(&opts.resource, "resource", "r", "l4s", "resource in payload")
 	cmd.Flags().StringVarP(&opts.catcherType, "catcher-type", "", "dns", "type of callback catcher (dns | ldap | tcp | none)")
@@ -79,9 +79,9 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().DurationVarP(&opts.timeout, "timeout", "", 3*time.Second, "time limit for requests")
 	cmd.Flags().IntVarP(&opts.maxThreads, "max-threads", "", 150, "max number of concurrent threads")
 	cmd.Flags().BoolVarP(&opts.checkCVE2021_45046, "check-cve-2021-45046", "", false, "check for CVE-2021-45046")
-	cmd.Flags().StringArrayVarP(&opts.headers, "header", "", nil, "header to use")
-	cmd.Flags().StringArrayVarP(&opts.fields, "field", "", nil, "field to use")
-	cmd.Flags().StringArrayVarP(&opts.payloads, "payload", "", nil, "payload to use")
+	cmd.Flags().StringSliceVarP(&opts.headers, "header", "", nil, "header to use")
+	cmd.Flags().StringSliceVarP(&opts.fields, "field", "", nil, "field to use")
+	cmd.Flags().StringSliceVarP(&opts.payloads, "payload", "", nil, "payload to use")
 }
 
 var unauthorizedHandler = func(verbose bool) internal.StatusCodeHandlerFunc {
