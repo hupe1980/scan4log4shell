@@ -24,7 +24,7 @@ run:
 	@go run *.go remote url -h
 
 .PHONY: run-local
-## run-remote: Runs local test environment
+## run-local: Runs local test environment
 run-local:
 	@docker-compose -f docker-compose.local.yml up --build
 
