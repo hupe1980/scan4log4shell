@@ -40,6 +40,8 @@ type RemoteOptions struct {
 	Fields             []string
 	PayLoadsFile       string
 	Payloads           []string
+	ParamsFile         string
+	Params             []string
 	Timeout            time.Duration
 	CheckCVE2021_45046 bool
 }
@@ -47,6 +49,7 @@ type RemoteScanner struct {
 	client             *http.Client
 	payloads           []string
 	fields             []string
+	params             []string
 	statusCodeHandlers map[int]StatusCodeHandlerFunc
 	opts               *RemoteOptions
 }
@@ -66,10 +69,20 @@ func NewRemoteScanner(opts *RemoteOptions) (*RemoteScanner, error) {
 		f = opts.Fields
 	}
 
+	q, err := readParams(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(opts.Params) > 0 {
+		q = opts.Params
+	}
+
 	return &RemoteScanner{
 		client:             newHTTPClient(opts),
 		payloads:           p,
 		fields:             f,
+		params:             q,
 		statusCodeHandlers: make(map[int]StatusCodeHandlerFunc),
 		opts:               opts,
 	}, nil
@@ -188,7 +201,10 @@ func (rs *RemoteScanner) newRequest(ctx context.Context, method, u, payload stri
 
 	// Add payload as query string
 	values := req.URL.Query()
-	values.Add("q", payload)
+	for _, q := range rs.params {
+		values.Add(q, payload)
+	}
+
 	req.URL.RawQuery = values.Encode()
 
 	return req, nil
@@ -360,6 +376,24 @@ func readFields(opts *RemoteOptions) ([]string, error) {
 	}
 
 	data, err := f.ReadFile("resource/fields.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	return parseFileContent(data), nil
+}
+
+func readParams(opts *RemoteOptions) ([]string, error) {
+	if opts.ParamsFile != "" {
+		data, err := ioutil.ReadFile(opts.ParamsFile)
+		if err != nil {
+			return nil, err
+		}
+
+		return parseFileContent(data), nil
+	}
+
+	data, err := f.ReadFile("resource/params.txt")
 	if err != nil {
 		return nil, err
 	}

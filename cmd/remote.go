@@ -37,6 +37,8 @@ type remoteOptions struct {
 	headers            []string
 	fieldsFile         string
 	fields             []string
+	paramsFile         string
+	params             []string
 	payloadsFile       string
 	payloads           []string
 	maxThreads         int
@@ -62,6 +64,7 @@ func newRemoteCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
 func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringVarP(&opts.headersFile, "headers-file", "", "", "use custom headers from file")
 	cmd.Flags().StringVarP(&opts.fieldsFile, "fields-file", "", "", "use custom field from file")
+	cmd.Flags().StringVarP(&opts.paramsFile, "params-file", "", "", "use custom query params from file")
 	cmd.Flags().StringVarP(&opts.payloadsFile, "payloads-file", "", "", "use custom payloads from file")
 	cmd.Flags().StringVarP(&opts.basicAuth, "basic-auth", "", "", "basic auth credentials (eg. user:pass)")
 	cmd.Flags().StringVarP(&opts.caddr, "caddr", "", "", "address to catch the callbacks (eg. ip:port)")
@@ -81,6 +84,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().BoolVarP(&opts.checkCVE2021_45046, "check-cve-2021-45046", "", false, "check for CVE-2021-45046")
 	cmd.Flags().StringSliceVarP(&opts.headers, "header", "", nil, "header to use")
 	cmd.Flags().StringSliceVarP(&opts.fields, "field", "", nil, "field to use")
+	cmd.Flags().StringSliceVarP(&opts.params, "param", "", nil, "query param to use")
 	cmd.Flags().StringSliceVarP(&opts.payloads, "payload", "", nil, "payload to use")
 }
 
