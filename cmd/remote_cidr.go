@@ -32,7 +32,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 		Example: `- Scan a complete cidr: scan4log4shell remote cidr 172.20.0.0/24
 - TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote cidr 172.20.0.0/24 --headers-file ./headers.txt
-- Run all tests: scan4log4shell rremote cidr 172.20.0.0/24 -t get,post,json --waf-bypass`,
+- Run all tests: scan4log4shell rremote cidr 172.20.0.0/24 -a`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -61,6 +61,8 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 
 			var wg sync.WaitGroup
 			sem := semaphore.NewWeighted(int64(opts.maxThreads))
+
+			allChecksShortcut(&opts.remoteOptions)
 
 			remoteOpts := &internal.RemoteOptions{
 				BasicAuth:          opts.basicAuth,

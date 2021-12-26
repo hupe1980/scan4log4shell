@@ -182,9 +182,10 @@ Examples:
 - Scan a complete cidr: scan4log4shell remote cidr 172.20.0.0/24
 - TCP catcher: scan4log4shell remote cidr 172.20.0.0/24 --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote cidr 172.20.0.0/24 --headers-file ./headers.txt
-- Run all tests: scan4log4shell rremote cidr 172.20.0.0/24 -t get,post,json --waf-bypass
+- Run all tests: scan4log4shell rremote cidr 172.20.0.0/24 -a
 
 Flags:
+  -a, --all                         shortcut to run all checks
       --auth-fuzzing                add auth fuzzing
       --basic-auth string           basic auth credentials (eg. user:pass)
       --caddr string                address to catch the callbacks (eg. ip:port)
@@ -192,6 +193,7 @@ Flags:
       --check-cve-2021-45046        check for CVE-2021-45046
       --field strings               field to use
       --fields-file string          use custom field from file
+      --form-fuzzing                add form submits to fuzzing
       --header strings              header to use
       --headers-file string         use custom headers from file
   -h, --help                        help for cidr
@@ -210,7 +212,6 @@ Flags:
       --set-field stringToString    set fix field value (key=value) (default [])
       --set-header stringToString   set fix header value (key=value) (default [])
       --set-param stringToString    set fix query param value (key=value) (default [])
-      --form-fuzzing                add form submits to fuzzing
       --timeout duration            time limit for requests (default 3s)
   -t, --type strings                get, post or json (default [get])
       --waf-bypass                  extend scans with WAF bypass payload
@@ -234,9 +235,10 @@ Examples:
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
 - Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass
-- Run all tests: scan4log4shell remote url https://target.org -t get,post,json --waf-bypass
+- Run all tests: scan4log4shell remote url https://target.org -a
 
 Flags:
+  -a, --all                         shortcut to run all checks
       --auth-fuzzing                add auth fuzzing
       --basic-auth string           basic auth credentials (eg. user:pass)
       --caddr string                address to catch the callbacks (eg. ip:port)
@@ -244,6 +246,7 @@ Flags:
       --check-cve-2021-45046        check for CVE-2021-45046
       --field strings               field to use
       --fields-file string          use custom field from file
+      --form-fuzzing                add form submits to fuzzing
       --header strings              header to use
       --headers-file string         use custom headers from file
   -h, --help                        help for url
@@ -260,7 +263,6 @@ Flags:
       --set-field stringToString    set fix field value (key=value) (default [])
       --set-header stringToString   set fix header value (key=value) (default [])
       --set-param stringToString    set fix query param value (key=value) (default [])
-      --form-fuzzing                add form submits to fuzzing
       --timeout duration            time limit for requests (default 3s)
   -t, --type strings                get, post or json (default [get])
       --waf-bypass                  extend scans with WAF bypass payload

@@ -32,7 +32,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
 - Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass
-- Run all tests: scan4log4shell remote url https://target.org -t get,post,json --waf-bypass`,
+- Run all tests: scan4log4shell remote url https://target.org -a`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -59,6 +59,8 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 
 			var wg sync.WaitGroup
 			sem := semaphore.NewWeighted(int64(opts.maxThreads))
+
+			allChecksShortcut(&opts.remoteOptions)
 
 			remoteOpts := &internal.RemoteOptions{
 				BasicAuth:          opts.basicAuth,

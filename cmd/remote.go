@@ -19,6 +19,7 @@ const (
 )
 
 type remoteOptions struct {
+	allChecks          bool
 	basicAuth          string
 	caddr              string
 	requestTypes       []string
@@ -65,6 +66,7 @@ func newRemoteCmd(noColor *bool, output *string, verbose *bool) *cobra.Command {
 }
 
 func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
+	cmd.Flags().BoolVarP(&opts.allChecks, "all", "a", false, "shortcut to run all checks")
 	cmd.Flags().StringVarP(&opts.headersFile, "headers-file", "", "", "use custom headers from file")
 	cmd.Flags().StringVarP(&opts.fieldsFile, "fields-file", "", "", "use custom field from file")
 	cmd.Flags().StringVarP(&opts.paramsFile, "params-file", "", "", "use custom query params from file")
@@ -92,6 +94,16 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringToStringVarP(&opts.headerValues, "set-header", "", nil, "set fix header value (key=value)")
 	cmd.Flags().StringToStringVarP(&opts.fieldValues, "set-field", "", nil, "set fix field value (key=value)")
 	cmd.Flags().StringToStringVarP(&opts.paramValues, "set-param", "", nil, "set fix query param value (key=value)")
+}
+
+func allChecksShortcut(opts *remoteOptions) {
+	if opts.allChecks {
+		opts.authFuzzing = true
+		opts.formFuzzing = true
+		opts.wafBypass = true
+		opts.checkCVE2021_45046 = true
+		opts.requestTypes = []string{"get", "post", "json"}
+	}
 }
 
 var unauthorizedHandler = func(verbose bool) internal.StatusCodeHandlerFunc {
