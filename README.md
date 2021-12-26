@@ -210,7 +210,7 @@ Flags:
       --set-field stringToString    set fix field value (key=value) (default [])
       --set-header stringToString   set fix header value (key=value) (default [])
       --set-param stringToString    set fix query param value (key=value) (default [])
-      --submit-forms                add form submits to fuzzing
+      --form-fuzzing                add form submits to fuzzing
       --timeout duration            time limit for requests (default 3s)
   -t, --type strings                get, post or json (default [get])
       --waf-bypass                  extend scans with WAF bypass payload
@@ -260,7 +260,7 @@ Flags:
       --set-field stringToString    set fix field value (key=value) (default [])
       --set-header stringToString   set fix header value (key=value) (default [])
       --set-param stringToString    set fix query param value (key=value) (default [])
-      --submit-forms                add form submits to fuzzing
+      --form-fuzzing                add form submits to fuzzing
       --timeout duration            time limit for requests (default 3s)
   -t, --type strings                get, post or json (default [get])
       --waf-bypass                  extend scans with WAF bypass payload

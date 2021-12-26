@@ -27,7 +27,7 @@ type remoteOptions struct {
 	resource           string
 	noUserAgentFuzzing bool
 	authFuzzing        bool
-	submitForms        bool
+	formFuzzing        bool
 	noRedirect         bool
 	noWaitTimeout      bool
 	wafBypass          bool
@@ -77,7 +77,7 @@ func addRemoteFlags(cmd *cobra.Command, opts *remoteOptions) {
 	cmd.Flags().StringVarP(&opts.catcherType, "catcher-type", "", "dns", "type of callback catcher (dns | ldap | tcp | none)")
 	cmd.Flags().BoolVarP(&opts.noUserAgentFuzzing, "no-user-agent-fuzzing", "", false, "exclude user-agent header from fuzzing")
 	cmd.Flags().BoolVarP(&opts.authFuzzing, "auth-fuzzing", "", false, "add auth fuzzing")
-	cmd.Flags().BoolVarP(&opts.submitForms, "submit-forms", "", false, "add form submits to fuzzing")
+	cmd.Flags().BoolVarP(&opts.formFuzzing, "form-fuzzing", "", false, "add form submits to fuzzing")
 	cmd.Flags().BoolVarP(&opts.noRedirect, "no-redirect", "", false, "do not follow redirects")
 	cmd.Flags().BoolVarP(&opts.noWaitTimeout, "no-wait-timeout", "", false, "wait forever for callbacks")
 	cmd.Flags().BoolVarP(&opts.wafBypass, "waf-bypass", "", false, "extend scans with WAF bypass payload ")

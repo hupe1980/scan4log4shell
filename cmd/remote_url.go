@@ -123,7 +123,7 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 				scanner.StatusCodeHandler(http.StatusUnauthorized, unauthorizedHandler(*verbose))
 			}
 
-			if opts.submitForms {
+			if opts.formFuzzing {
 				scanner.StatusCodeHandler(http.StatusOK, submitFormHanlder(*verbose))
 			}
 

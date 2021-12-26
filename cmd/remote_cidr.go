@@ -128,7 +128,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 				scanner.StatusCodeHandler(http.StatusUnauthorized, unauthorizedHandler(*verbose))
 			}
 
-			if opts.submitForms {
+			if opts.formFuzzing {
 				scanner.StatusCodeHandler(http.StatusOK, submitFormHanlder(*verbose))
 			}
 
