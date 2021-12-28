@@ -28,7 +28,7 @@ run:
 run-local:
 	@docker-compose -f docker-compose.local.yml up --build
 
-.PhONY: run-remote
+.PHONY: run-remote
 ## run-remote: Runs remote test environment
 run-remote:
 	@docker-compose -f docker-compose.remote.yml up --build
