@@ -19,6 +19,11 @@ test:
 build:
 	@go build -o scan4log4shell .
 
+.PHOMY: docker-build
+## docker-build: Build a docker image
+docker-build:
+	docker build -t scan4log4shell .
+
 .PHONY: run
 run:
 	@go run *.go remote url -h

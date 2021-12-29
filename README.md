@@ -55,6 +55,16 @@ make build
 
 (Add the appropriate .exe extension on Windows systems, of course.)
 
+## Docker Support
+```bash
+git clone https://github.com/hupe1980/scan4log4shell
+cd scan4log4shell
+make docker-build
+
+# Scan the current working directory
+docker run -it --rm -v $PWD:/data scan4log4shell local /data
+```
+
 ## Usage 
 ```console
 Usage:
