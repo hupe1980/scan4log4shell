@@ -54,7 +54,7 @@ brews:
       owner: hupe1980
       name: homebrew-scan4log4shell
     homepage:  https://github.com/hupe1980/scan4log4shell
-    description: Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
+    description: Scanner to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability and to detect vulnerable log4j versions on your local file-system
     license: MIT
     test: |
       system "#{bin}/scan4log4shell -v"
@@ -68,13 +68,13 @@ scoop:
     owner: hupe1980
     name: scan4log4shell-bucket
   homepage:  https://github.com/hupe1980/scan4log4shell
-  description: Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
+  description: Scanner to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability and to detect vulnerable log4j versions on your local file-system
   license: MIT
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     homepage:  https://github.com/hupe1980/scan4log4shell
     maintainer: Frank Hübner <frankhuebner1980@gmail.com>
-    description: Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
+    description: Scanner to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability and to detect vulnerable log4j versions on your local file-system
     license: MIT
     contents:
       - src: ./completions/scan4log4shell.bash

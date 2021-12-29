@@ -1,5 +1,5 @@
 # scan4log4shell
-> Scanner to detect vulnerable log4j versions on your file-system or to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability
+> Scanner to send specially crafted requests and catch callbacks of systems that are impacted by log4j log4shell vulnerability and to detect vulnerable log4j versions on your local file-system
 
 ## Features
 - [Local](#local) and [remote](#remote) scanner
