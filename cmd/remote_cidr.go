@@ -119,7 +119,7 @@ func newRemoteCIDRCmd(noColor *bool, output *string, verbose *bool) *cobra.Comma
 				}()
 			}
 
-			printInfo("Start scanning CIDR %s\n---------", cidr)
+			printInfo("Start scanning CIDR %s", cidr)
 
 			scanner, err := internal.NewRemoteScanner(remoteOpts)
 			if err != nil {
