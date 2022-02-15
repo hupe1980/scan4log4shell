@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
+	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -26,9 +29,9 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 	cmd := &cobra.Command{
 		Use:   "url [urls]",
 		Short: "Send specially crafted requests to an url",
-		Args:  cobra.MinimumNArgs(1),
 		Example: `- Scan a url: scan4log4shell remote url https://target.org
 - Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
+- Scan multiple urls: cat targets.txt | scan4log4shell remote url
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
 - Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass
@@ -131,8 +134,13 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 
 			errs := make(chan error)
 
-			for _, targetURL := range args {
-				printInfo("Start scanning CIDR %s\n---------", targetURL)
+			target, err := newTarget(args)
+			if err != nil {
+				return err
+			}
+
+			for targetURL := range target.URL() {
+				printInfo("Start scanning URL %s", targetURL)
 
 				for _, payload := range scanner.Payloads() {
 					for _, method := range opts.requestTypes {
@@ -199,4 +207,45 @@ func newRemoteURLCmd(noColor *bool, output *string, verbose *bool) *cobra.Comman
 	addRemoteFlags(cmd, &opts.remoteOptions)
 
 	return cmd
+}
+
+type target struct {
+	reader io.Reader
+}
+
+func newTarget(args []string) (*target, error) {
+	r, err := newTargetReader(args)
+	if err != nil {
+		return nil, err
+	}
+
+	return &target{
+		reader: r,
+	}, nil
+}
+
+func (t *target) URL() <-chan string {
+	br := bufio.NewScanner(t.reader)
+
+	url := make(chan string)
+
+	go func() {
+		for br.Scan() {
+			url <- br.Text()
+		}
+		close(url)
+	}()
+
+	return url
+}
+
+func newTargetReader(args []string) (io.Reader, error) {
+	switch {
+	case len(args) != 0:
+		return strings.NewReader(strings.Join(args, "\n")), nil
+	case hasStdin():
+		return os.Stdin, nil
+	default:
+		return nil, errors.New("no target data")
+	}
 }

